@@ -35,7 +35,7 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
       <div className="p-3 flex flex-col gap-3 max-h-[420px] overflow-y-auto">
         {groups.map((group) => (
           <div key={group.label}>
-            <div className="font-mono text-[11px] uppercase tracking-wider mb-1.5" style={{ color: group.color }}>
+            <div className="font-mono text-sm uppercase tracking-wider mb-1.5" style={{ color: group.color }}>
               {group.label}
             </div>
             <div className="flex flex-col gap-1.5">
@@ -79,16 +79,16 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
                       )}
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className="block font-bold text-xs leading-tight" style={{ color: owned ? "#3a5040" : "#99a8a2" }}>
+                      <span className="block font-bold text-sm leading-tight" style={{ color: owned ? "#3a5040" : "#99a8a2" }}>
                         {upgrade.name}
-                        {owned && <span className="ml-1 text-[10px]" style={{ color: "#44aa44" }}>[MUTATED]</span>}
+                        {owned && <span className="ml-1 text-xs" style={{ color: "#44aa44" }}>[MUTATED]</span>}
                       </span>
-                      <span className="block text-[10px] leading-tight" style={{ color: "#3a5040" }}>
+                      <span className="block text-xs leading-snug" style={{ color: "#3a5040" }}>
                         {locked ? "Evolve previous tier first" : upgrade.description}
                       </span>
                     </span>
                     {!owned && !locked && (
-                      <span className="font-mono text-xs font-bold whitespace-nowrap shrink-0" style={{ color: upgrade.currency === "biomass" ? "#884488" : "#c89030" }}>
+                      <span className="font-mono text-sm font-bold whitespace-nowrap shrink-0" style={{ color: upgrade.currency === "biomass" ? "#884488" : "#c89030" }}>
                         {upgrade.cost} {upgrade.currency === "biomass" ? "BM" : "NUT"}
                       </span>
                     )}

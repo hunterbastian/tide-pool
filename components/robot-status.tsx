@@ -29,14 +29,14 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
         />
         {/* Level badge */}
         <div
-          className="absolute -top-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-2"
+          className="absolute -top-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full border-2"
           style={{
             background: "linear-gradient(180deg, #2a6a2a, #1a4a1a)",
             borderColor: "#0e2a0e",
             boxShadow: "0 0 6px rgba(68,170,68,0.2)",
           }}
         >
-          <span className="font-mono text-xs font-bold" style={{ color: "#c0e0c0", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
+          <span className="font-mono text-sm font-bold" style={{ color: "#c0e0c0", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
             {state.level}
           </span>
         </div>
@@ -91,7 +91,7 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
           >
             <ChevronLeft className="h-3.5 w-3.5" style={{ color: "#4a6058" }} />
           </button>
-          <span className="w-16 text-center font-mono text-[10px]" style={{ color: "#4a6058" }}>
+          <span className="w-20 text-center font-mono text-sm" style={{ color: "#4a6058" }}>
             {HATS[state.hatIndex % HATS.length] ?? "none"}
           </span>
           <button
@@ -107,10 +107,10 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
       {/* XP Bar */}
       <div className="w-full">
         <div className="flex items-center justify-between mb-1">
-          <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: "#3a5040" }}>Level {state.level}</span>
-          <span className="font-mono text-[10px]" style={{ color: "#3a5040" }}>{state.xp} / {state.xpToNext} XP</span>
+          <span className="font-mono text-sm uppercase tracking-wider" style={{ color: "#3a5040" }}>Level {state.level}</span>
+          <span className="font-mono text-sm" style={{ color: "#3a5040" }}>{state.xp} / {state.xpToNext} XP</span>
         </div>
-        <div className="retro-bar h-3">
+        <div className="retro-bar h-4">
           <div
             className="retro-bar-fill"
             style={{
@@ -124,19 +124,19 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
       {/* Currencies */}
       <div className="flex items-center gap-2 w-full">
         <div className="flex-1 flex items-center justify-center gap-1.5 py-1.5" style={{ background: "#0a1210", border: "1px solid #1a2818", borderRadius: "2px" }}>
-          <Droplets className="h-3.5 w-3.5" style={{ color: "#c89030" }} />
-          <span className="font-mono text-sm font-bold" style={{ color: "#c89030" }}>{Math.floor(state.nutrients)}</span>
-          <span className="font-mono text-[9px]" style={{ color: "#4a6058" }}>NUT</span>
+          <Droplets className="h-4 w-4" style={{ color: "#c89030" }} />
+          <span className="font-mono text-base font-bold" style={{ color: "#c89030" }}>{Math.floor(state.nutrients)}</span>
+          <span className="font-mono text-xs" style={{ color: "#4a6058" }}>NUT</span>
         </div>
-        <div className="flex-1 flex items-center justify-center gap-1.5 py-1.5" style={{ background: "#0e0a12", border: "1px solid #1a1828", borderRadius: "2px" }}>
-          <span className="font-mono text-sm font-bold" style={{ color: "#884488" }}>{state.biomass}</span>
-          <span className="font-mono text-[9px]" style={{ color: "#4a6058" }}>BM</span>
+        <div className="flex-1 flex items-center justify-center gap-1.5 py-2" style={{ background: "#0e0a12", border: "1px solid #1a1828", borderRadius: "2px" }}>
+          <span className="font-mono text-base font-bold" style={{ color: "#884488" }}>{state.biomass}</span>
+          <span className="font-mono text-xs" style={{ color: "#4a6058" }}>BM</span>
         </div>
       </div>
 
       {/* Idle income rate */}
       <div className="w-full text-center py-1" style={{ background: "#040808", border: "1px solid #121a14", borderRadius: "2px" }}>
-        <span className="font-mono text-[10px]" style={{ color: "#44aa44", textShadow: "0 0 4px rgba(68,170,68,0.2)" }}>
+        <span className="font-mono text-sm" style={{ color: "#44aa44", textShadow: "0 0 4px rgba(68,170,68,0.2)" }}>
           +{state.nutrientsPerSec.toFixed(1)} nutrients/sec
         </span>
       </div>
@@ -151,10 +151,10 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
 
       {/* Power + stats */}
       <div className="flex items-center justify-between w-full">
-        <span className="font-mono text-[10px]" style={{ color: "#3a5040" }}>
+        <span className="font-mono text-sm" style={{ color: "#3a5040" }}>
           PWR: <span className="font-bold" style={{ color: "#99a8a2" }}>{power}</span>
         </span>
-        <span className="font-mono text-[10px]" style={{ color: "#3a5040" }}>
+        <span className="font-mono text-sm" style={{ color: "#3a5040" }}>
           {state.totalAdventures} exp / {state.totalDevours} kills
         </span>
       </div>
@@ -168,13 +168,13 @@ function StatBar({ icon: Icon, label, value, color }: { icon: React.ElementType;
 
   return (
     <div className="flex items-center gap-1.5 px-2 py-1.5" style={{ background: "#040808", border: "1px solid #121a14", borderRadius: "2px" }}>
-      <Icon className="h-3 w-3 shrink-0" style={{ color }} />
+      <Icon className="h-3.5 w-3.5 shrink-0" style={{ color }} />
       <div className="flex-1">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] font-bold" style={{ color: "#4a6058" }}>{label}</span>
-          <span className="font-mono text-[10px] font-bold" style={{ color }}>{value}</span>
+          <span className="font-mono text-sm font-bold" style={{ color: "#4a6058" }}>{label}</span>
+          <span className="font-mono text-sm font-bold" style={{ color }}>{value}</span>
         </div>
-        <div className="retro-bar h-1.5 mt-0.5">
+        <div className="retro-bar h-2 mt-0.5">
           <div className="retro-bar-fill" style={{ width: `${percent}%`, background: color }} />
         </div>
       </div>

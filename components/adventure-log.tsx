@@ -21,7 +21,7 @@ export function AdventureLogView({ logs }: AdventureLogViewProps) {
         <div className="retro-panel-header">Expedition Log</div>
         <div className="flex flex-col items-center gap-2 py-8">
           <ScrollText className="h-8 w-8" style={{ color: "#1e3028" }} />
-          <p className="text-xs font-mono" style={{ color: "#3a5040" }}>No kills yet. Send your cell into the murk.</p>
+          <p className="text-sm font-mono" style={{ color: "#3a5040" }}>No kills yet. Send your cell into the murk.</p>
         </div>
       </div>
     )
@@ -42,19 +42,19 @@ export function AdventureLogView({ logs }: AdventureLogViewProps) {
               className="flex items-start gap-2 px-2 py-1.5 border border-[#121a14]"
               style={{ background: "#040808", borderRadius: "2px" }}
             >
-              <Icon className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: config.color }} />
+              <Icon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: config.color }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold" style={{ color: config.color }}>{config.label}</span>
-                  <span className="text-[10px]" style={{ color: "#2a3a32" }}>{log.biome.name}</span>
-                  <span className="ml-auto text-[10px] shrink-0" style={{ color: "#1e3028" }}>{timeAgo}</span>
+                  <span className="text-sm font-bold" style={{ color: config.color }}>{config.label}</span>
+                  <span className="text-sm" style={{ color: "#2a3a32" }}>{log.biome.name}</span>
+                  <span className="ml-auto text-xs shrink-0" style={{ color: "#1e3028" }}>{timeAgo}</span>
                 </div>
-                <p className="text-[11px] leading-tight mt-0.5" style={{ color: "#708880" }}>{log.message}</p>
+                <p className="text-sm leading-snug mt-0.5" style={{ color: "#708880" }}>{log.message}</p>
                 <div className="flex gap-2 mt-0.5">
-                  <span className="font-mono text-[10px] font-bold" style={{ color: "#44aa44" }}>+{log.xpGained}xp</span>
-                  <span className="font-mono text-[10px] font-bold" style={{ color: "#c89030" }}>+{log.nutrientsGained}nut</span>
+                  <span className="font-mono text-sm font-bold" style={{ color: "#44aa44" }}>+{log.xpGained}xp</span>
+                  <span className="font-mono text-sm font-bold" style={{ color: "#c89030" }}>+{log.nutrientsGained}nut</span>
                   {log.biomassGained > 0 && (
-                    <span className="font-mono text-[10px] font-bold" style={{ color: "#884488" }}>+{log.biomassGained}bm</span>
+                    <span className="font-mono text-sm font-bold" style={{ color: "#884488" }}>+{log.biomassGained}bm</span>
                   )}
                 </div>
               </div>

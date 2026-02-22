@@ -93,9 +93,9 @@
 .retro-panel-header {
   background: linear-gradient(180deg, #142420 0%, #0e1a1e 100%);
   border-bottom: 1px solid #1e3028;
-  padding: 6px 12px;
+  padding: 8px 12px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #c89030;
@@ -165,7 +165,7 @@
 
 .retro-stat-label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #4a6058;

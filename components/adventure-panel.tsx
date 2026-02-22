@@ -30,8 +30,8 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
       <div className="retro-panel-header flex items-center justify-between">
         <span>Biome Explorer</span>
         {state.isAdventuring && (
-          <span className="flex items-center gap-1.5 text-[#44aa44] text-xs normal-case tracking-normal">
-            <Timer className="h-3.5 w-3.5 animate-spin" style={{ animationDuration: "3s" }} />
+          <span className="flex items-center gap-1.5 text-[#44aa44] text-sm normal-case tracking-normal">
+            <Timer className="h-4 w-4 animate-spin" style={{ animationDuration: "3s" }} />
             {timeLeft > 0 ? formatTime(timeLeft) : "Returning..."}
           </span>
         )}
@@ -40,7 +40,7 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
       {/* Active adventure banner */}
       {state.isAdventuring && state.currentBiome && (
         <div className="mx-3 mt-3 border border-[#1e3028] px-3 py-2" style={{ background: "linear-gradient(180deg, #0e1a12 0%, #080f0a 100%)", borderRadius: "2px" }}>
-          <p className="text-center text-xs font-bold font-mono uppercase tracking-wider" style={{ color: "#44aa44", textShadow: "0 0 4px rgba(68,170,68,0.2)" }}>
+          <p className="text-center text-sm font-bold font-mono uppercase tracking-wider" style={{ color: "#44aa44", textShadow: "0 0 4px rgba(68,170,68,0.2)" }}>
             Hunting in {state.currentBiome.name}...
           </p>
           <div className="mt-1 flex justify-center gap-1">
@@ -94,32 +94,32 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
                   ) : (
                     <Lock className="w-3 h-3 shrink-0" style={{ color: "#2a3a32" }} />
                   )}
-                  <span className="font-bold text-xs" style={{ color: unlocked ? "#99a8a2" : "#2a3a32" }}>
+                  <span className="font-bold text-sm" style={{ color: unlocked ? "#99a8a2" : "#2a3a32" }}>
                     {biome.name}
                   </span>
                 </div>
                 {unlocked && (
-                  <span className="font-mono text-[10px]" style={{ color: "#4a6058" }}>
+                  <span className="font-mono text-sm" style={{ color: "#4a6058" }}>
                     ~{biome.baseDuration}s
                   </span>
                 )}
               </div>
 
-              <p className="text-[10px] leading-tight" style={{ color: "#3a5040" }}>
+              <p className="text-sm leading-snug" style={{ color: "#3a5040" }}>
                 {unlocked ? biome.description : `Requires Level ${biome.requiredLevel}`}
               </p>
 
               {unlocked && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-[10px] font-bold" style={{ color: "#44aa44" }}>+{biome.baseReward.xp}xp</span>
-                    <span className="font-mono text-[10px] font-bold" style={{ color: "#c89030" }}>+{biome.baseReward.nutrients}nut</span>
+                    <span className="font-mono text-sm font-bold" style={{ color: "#44aa44" }}>+{biome.baseReward.xp}xp</span>
+                    <span className="font-mono text-sm font-bold" style={{ color: "#c89030" }}>+{biome.baseReward.nutrients}nut</span>
                     {biome.baseReward.biomass > 0 && (
-                      <span className="font-mono text-[10px] font-bold" style={{ color: "#884488" }}>+{biome.baseReward.biomass}bm</span>
+                      <span className="font-mono text-sm font-bold" style={{ color: "#884488" }}>+{biome.baseReward.biomass}bm</span>
                     )}
                   </div>
                   {/* Success estimate */}
-                  <span className="font-mono text-[10px]" style={{ color: successEst > 60 ? "#44aa44" : successEst > 35 ? "#c89030" : "#aa3030" }}>
+                  <span className="font-mono text-sm" style={{ color: successEst > 60 ? "#44aa44" : successEst > 35 ? "#c89030" : "#aa3030" }}>
                     {successEst}%
                   </span>
                 </div>

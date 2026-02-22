@@ -225,19 +225,19 @@ export default function CellStageGame() {
         <div className="mx-auto flex max-w-5xl items-center gap-2.5 px-4 py-2">
           <FlaskConical className="h-5 w-5" style={{ color: "#44aa44" }} />
           <h1
-            className="font-mono text-sm font-bold uppercase tracking-widest"
+            className="font-mono text-base font-bold uppercase tracking-widest"
             style={{ color: "#c89030", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}
           >
             Cell Stage
           </h1>
-          <span className="ml-auto font-mono text-[11px]" style={{ color: "#4a6058" }}>
+          <span className="ml-auto font-mono text-sm" style={{ color: "#4a6058" }}>
             LVL {state.level}
           </span>
           <div className="w-px h-4" style={{ background: "#1e3028" }} />
-          <span className="font-mono text-[11px]" style={{ color: "#c89030" }}>
+          <span className="font-mono text-sm" style={{ color: "#c89030" }}>
             {Math.floor(state.nutrients)} NUT
           </span>
-          <span className="font-mono text-[11px]" style={{ color: "#884488" }}>
+          <span className="font-mono text-sm" style={{ color: "#884488" }}>
             {state.biomass} BM
           </span>
         </div>
@@ -246,7 +246,7 @@ export default function CellStageGame() {
       {/* Offline earnings banner */}
       {offlineMessage && (
         <div
-          className="relative z-30 text-center py-2 text-xs font-mono font-bold cursor-pointer"
+          className="relative z-30 text-center py-2 text-sm font-mono font-bold cursor-pointer"
           style={{
             background: "linear-gradient(90deg, #0e1a12, #081210, #0e1a12)",
             color: "#44aa44",
@@ -286,7 +286,7 @@ export default function CellStageGame() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className="flex flex-1 items-center justify-center gap-1.5 py-2 text-xs font-bold uppercase tracking-widest transition-all"
+                    className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-bold uppercase tracking-widest transition-all"
                     style={{
                       background: active
                         ? "linear-gradient(180deg, #142420, #0e1a1e)"
@@ -297,7 +297,7 @@ export default function CellStageGame() {
                       borderRadius: "2px",
                     }}
                   >
-                    <Icon className="h-3.5 w-3.5" />
+                    <Icon className="h-4 w-4" />
                     <span className="hidden sm:inline">{tab.label}</span>
                   </button>
                 )
