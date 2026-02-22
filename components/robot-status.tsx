@@ -4,7 +4,7 @@ import type { GameState } from "@/lib/game-state"
 import { getTotalPower } from "@/lib/game-state"
 import { RobotAvatar, ROBOT_COLORS, HATS } from "@/components/robot-avatar"
 import { cn } from "@/lib/utils"
-import { Sword, Shield, Zap, Clover, Star, ChevronLeft, ChevronRight, Paintbrush, Coins } from "lucide-react"
+import { Sword, Shield, Zap, Clover, Dna, ChevronLeft, ChevronRight, Paintbrush, Coins } from "lucide-react"
 
 interface RobotStatusProps {
   state: GameState
@@ -71,7 +71,7 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
         <div className="h-4 w-px bg-border" />
 
         <div className="flex items-center gap-1">
-          <Star className="h-3.5 w-3.5 text-muted-foreground" />
+          <Dna className="h-3.5 w-3.5 text-muted-foreground" />
           <button
             onClick={() => onChangeHat((state.hatIndex - 1 + HATS.length) % HATS.length)}
             className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
