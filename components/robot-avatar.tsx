@@ -3,11 +3,11 @@
 import { cn } from "@/lib/utils"
 
 const CELL_COLORS = [
-  { body: "#4ECDC4", accent: "#2BA89F", highlight: "#A8F0EA", membrane: "#3BB8B0", glow: "rgba(78,205,196,0.4)" },
-  { body: "#FF6B6B", accent: "#CC4444", highlight: "#FFB3B3", membrane: "#E05A5A", glow: "rgba(255,107,107,0.4)" },
-  { body: "#FFB84D", accent: "#CC8820", highlight: "#FFD999", membrane: "#E0A040", glow: "rgba(255,184,77,0.4)" },
-  { body: "#7C83FD", accent: "#5555DD", highlight: "#B5B9FE", membrane: "#6A70E0", glow: "rgba(124,131,253,0.4)" },
-  { body: "#95E66A", accent: "#60BB33", highlight: "#C5F0A8", membrane: "#82CC5C", glow: "rgba(149,230,106,0.4)" },
+  { body: "#3a7a68", accent: "#1a5a48", highlight: "#5a9a80", membrane: "#2a6a58", glow: "rgba(58,122,104,0.2)" },
+  { body: "#8a4040", accent: "#6a2828", highlight: "#aa6060", membrane: "#7a3535", glow: "rgba(138,64,64,0.2)" },
+  { body: "#8a7a40", accent: "#6a5a20", highlight: "#aa9a60", membrane: "#7a6a30", glow: "rgba(138,122,64,0.2)" },
+  { body: "#506080", accent: "#304060", highlight: "#708aa0", membrane: "#405070", glow: "rgba(80,96,128,0.2)" },
+  { body: "#5a8a4a", accent: "#3a6a2a", highlight: "#7aaa6a", membrane: "#4a7a3a", glow: "rgba(90,138,74,0.2)" },
 ]
 
 const APPENDAGES = [
@@ -307,19 +307,20 @@ export function RobotAvatar({
           {hasEye && <circle cx="116" cy="85" r="1.5" fill={color.highlight} opacity="0.6" />}
         </g>
 
-        {/* Mouth */}
+        {/* Mouth — jagged, predatory */}
         <path
-          d={isAdventuring ? "M90,105 Q100,118 110,105" : "M92,105 Q100,113 108,105"}
+          d={isAdventuring ? "M88,104 L94,110 L100,104 L106,110 L112,104" : "M90,106 Q100,112 110,106"}
           stroke={color.membrane}
-          strokeWidth="2.5"
+          strokeWidth="2"
           fill={isAdventuring ? color.accent : "none"}
-          fillOpacity="0.3"
+          fillOpacity="0.25"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
 
-        {/* Cheek blush */}
-        <ellipse cx="68" cy="95" rx="7" ry="4" fill="#FF9999" opacity="0.3" />
-        <ellipse cx="132" cy="95" rx="7" ry="4" fill="#FF9999" opacity="0.3" />
+        {/* Scars / irritation marks */}
+        <ellipse cx="68" cy="95" rx="6" ry="3.5" fill={color.accent} opacity="0.15" />
+        <ellipse cx="132" cy="95" rx="6" ry="3.5" fill={color.accent} opacity="0.15" />
 
         {/* Digestion particles when adventuring */}
         {isAdventuring && (

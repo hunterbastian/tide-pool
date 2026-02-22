@@ -7,8 +7,8 @@ const _nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito" });
 const _vt323 = VT323({ weight: "400", subsets: ["latin"], variable: "--font-vt323" });
 
 export const metadata: Metadata = {
-  title: 'Cell Stage - Evolve or Perish',
-  description: 'Evolve your cell organism, collect nutrients, and conquer the primordial soup!',
+  title: 'Cell Stage - Survive the Murk',
+  description: 'Evolve. Consume. Survive. An idle cell organism game where only the ruthless thrive.',
   generator: 'v0.app',
   icons: {
     icon: [

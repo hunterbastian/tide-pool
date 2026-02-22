@@ -10,9 +10,10 @@ interface Particle {
   speedY: number
   opacity: number
   color: string
-  type: "nutrient" | "bubble" | "microbe"
+  type: "debris" | "bubble" | "predator" | "spore"
   wobble: number
   wobbleSpeed: number
+  rot: number
 }
 
 export function PrimordialSoup() {
@@ -33,29 +34,30 @@ export function PrimordialSoup() {
     resize()
     window.addEventListener("resize", resize)
 
-    // Seed particles
     const colors = {
-      nutrient: ["#3ecf5c", "#40e070", "#80ff90"],
-      bubble: ["#2060a0", "#3080c0", "#4090d0"],
-      microbe: ["#e06030", "#d04040", "#c07040"],
+      debris: ["#1a2a18", "#2a3820", "#1a3018", "#223020"],
+      bubble: ["#0a1a14", "#102018", "#0a1810"],
+      predator: ["#3a1818", "#4a2020", "#301010"],
+      spore: ["#2a2818", "#383020", "#2a2010"],
     }
 
     const particles: Particle[] = []
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 70; i++) {
       const type: Particle["type"] =
-        i < 30 ? "nutrient" : i < 48 ? "bubble" : "microbe"
+        i < 30 ? "debris" : i < 45 ? "bubble" : i < 58 ? "spore" : "predator"
       const colorSet = colors[type]
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: type === "bubble" ? 2 + Math.random() * 6 : type === "microbe" ? 3 + Math.random() * 4 : 1.5 + Math.random() * 3,
-        speedX: (Math.random() - 0.5) * 0.3,
-        speedY: type === "bubble" ? -(0.1 + Math.random() * 0.3) : (Math.random() - 0.5) * 0.2,
-        opacity: 0.15 + Math.random() * 0.35,
+        size: type === "predator" ? 4 + Math.random() * 6 : type === "bubble" ? 2 + Math.random() * 5 : 1 + Math.random() * 3,
+        speedX: (Math.random() - 0.5) * 0.2,
+        speedY: type === "bubble" ? -(0.05 + Math.random() * 0.15) : (Math.random() - 0.5) * 0.12,
+        opacity: 0.1 + Math.random() * 0.25,
         color: colorSet[Math.floor(Math.random() * colorSet.length)],
         type,
         wobble: Math.random() * Math.PI * 2,
-        wobbleSpeed: 0.01 + Math.random() * 0.03,
+        wobbleSpeed: 0.005 + Math.random() * 0.02,
+        rot: Math.random() * Math.PI * 2,
       })
     }
     particlesRef.current = particles
@@ -67,10 +69,10 @@ export function PrimordialSoup() {
 
       for (const p of particles) {
         p.wobble += p.wobbleSpeed
-        p.x += p.speedX + Math.sin(p.wobble) * 0.3
-        p.y += p.speedY + Math.cos(p.wobble) * 0.15
+        p.rot += 0.003
+        p.x += p.speedX + Math.sin(p.wobble) * 0.2
+        p.y += p.speedY + Math.cos(p.wobble) * 0.1
 
-        // Wrap around
         if (p.x < -20) p.x = canvas.width + 20
         if (p.x > canvas.width + 20) p.x = -20
         if (p.y < -20) p.y = canvas.height + 20
@@ -79,34 +81,42 @@ export function PrimordialSoup() {
         ctx.save()
         ctx.globalAlpha = p.opacity
 
-        if (p.type === "nutrient") {
-          // Small glowing dots
+        if (p.type === "debris") {
+          // Irregular organic chunks
+          ctx.translate(p.x, p.y)
+          ctx.rotate(p.rot)
+          ctx.beginPath()
+          const segs = 5
+          for (let s = 0; s <= segs; s++) {
+            const angle = (s / segs) * Math.PI * 2
+            const r = p.size * (0.6 + 0.4 * Math.sin(s * 2.1 + time * 0.005))
+            const px = Math.cos(angle) * r
+            const py = Math.sin(angle) * r
+            if (s === 0) ctx.moveTo(px, py)
+            else ctx.lineTo(px, py)
+          }
+          ctx.closePath()
+          ctx.fillStyle = p.color
+          ctx.fill()
+        } else if (p.type === "bubble") {
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+          ctx.strokeStyle = p.color
+          ctx.lineWidth = 0.6
+          ctx.stroke()
+        } else if (p.type === "spore") {
+          // Tiny dots, faintly glowing
           ctx.beginPath()
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
           ctx.fillStyle = p.color
           ctx.fill()
-          ctx.shadowBlur = 8
-          ctx.shadowColor = p.color
-          ctx.fill()
-        } else if (p.type === "bubble") {
-          // Hollow circles
-          ctx.beginPath()
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-          ctx.strokeStyle = p.color
-          ctx.lineWidth = 0.8
-          ctx.stroke()
-          // Highlight
-          ctx.beginPath()
-          ctx.arc(p.x - p.size * 0.3, p.y - p.size * 0.3, p.size * 0.25, 0, Math.PI * 2)
-          ctx.fillStyle = "rgba(255,255,255,0.3)"
-          ctx.fill()
         } else {
-          // Microbe — little amoeba shapes
+          // Predator — darker amoeba shape, slightly larger
           ctx.beginPath()
-          const segs = 6
+          const segs = 7
           for (let s = 0; s <= segs; s++) {
             const angle = (s / segs) * Math.PI * 2
-            const r = p.size * (0.8 + 0.2 * Math.sin(time * 0.03 + s * 1.5))
+            const r = p.size * (0.7 + 0.3 * Math.sin(time * 0.015 + s * 1.8))
             const px = p.x + Math.cos(angle) * r
             const py = p.y + Math.sin(angle) * r
             if (s === 0) ctx.moveTo(px, py)
@@ -114,6 +124,12 @@ export function PrimordialSoup() {
           }
           ctx.closePath()
           ctx.fillStyle = p.color
+          ctx.fill()
+          // Dim red eye
+          ctx.beginPath()
+          ctx.arc(p.x + p.size * 0.2, p.y - p.size * 0.1, 1, 0, Math.PI * 2)
+          ctx.fillStyle = "#601010"
+          ctx.globalAlpha = 0.3 + 0.2 * Math.sin(time * 0.03)
           ctx.fill()
         }
 

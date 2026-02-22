@@ -22,11 +22,11 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
   const allUpgrades = [...UPGRADES, ...IDLE_UPGRADES]
 
   const groups = [
-    { label: "Offense", ids: ["tox-1", "tox-2", "tox-3"], color: "#e04040" },
-    { label: "Defense", ids: ["mem-1", "mem-2", "mem-3"], color: "#40a0e0" },
-    { label: "Speed", ids: ["mot-1", "mot-2", "mot-3"], color: "#3ecf5c" },
-    { label: "Senses", ids: ["ada-1", "ada-2", "ada-3"], color: "#f0c040" },
-    { label: "Idle Income", ids: ["idle-1", "idle-2", "idle-3"], color: "#c060e0" },
+    { label: "Offense", ids: ["tox-1", "tox-2", "tox-3"], color: "#aa3030" },
+    { label: "Defense", ids: ["mem-1", "mem-2", "mem-3"], color: "#3080a0" },
+    { label: "Speed", ids: ["mot-1", "mot-2", "mot-3"], color: "#44aa44" },
+    { label: "Senses", ids: ["ada-1", "ada-2", "ada-3"], color: "#c89030" },
+    { label: "Parasitic Income", ids: ["idle-1", "idle-2", "idle-3"], color: "#884488" },
   ]
 
   return (
@@ -57,37 +57,38 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
                     key={id}
                     onClick={() => onPurchase(upgrade)}
                     disabled={owned || locked || !canAfford}
-                    className={`flex items-center gap-2.5 px-2.5 py-2 rounded text-left transition-all text-sm ${
+                    className={`flex items-center gap-2.5 px-2.5 py-2 text-left transition-all text-sm ${
                       owned
-                        ? "bg-[#1a3050] border border-[#2a4a6a] opacity-60 cursor-default"
+                        ? "bg-[#0a1210] border border-[#1a2818] opacity-50 cursor-default"
                         : locked
-                        ? "bg-[#0f1a2a] border border-[#1a2a3a] opacity-40 cursor-not-allowed"
+                        ? "bg-[#040808] border border-[#0a1010] opacity-30 cursor-not-allowed"
                         : canAfford
                         ? "retro-btn"
-                        : "bg-[#1a2a40] border border-[#2a3a50] opacity-50 cursor-not-allowed"
+                        : "bg-[#0a1210] border border-[#121a14] opacity-40 cursor-not-allowed"
                     }`}
+                    style={{ borderRadius: "2px" }}
                   >
                     <span
                       className="flex items-center justify-center w-7 h-7 rounded shrink-0"
-                      style={{ background: owned ? "#2a4a6a" : `${group.color}30` }}
+                      style={{ background: owned ? "#121a14" : `${group.color}20` }}
                     >
                       {locked ? (
-                        <Lock className="w-3.5 h-3.5" style={{ color: "#5a7a9a" }} />
+                        <Lock className="w-3.5 h-3.5" style={{ color: "#2a3a32" }} />
                       ) : (
-                        <Icon className="w-3.5 h-3.5" style={{ color: owned ? "#5a7a9a" : group.color }} />
+                        <Icon className="w-3.5 h-3.5" style={{ color: owned ? "#2a3a32" : group.color }} />
                       )}
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className="block font-bold text-xs leading-tight" style={{ color: owned ? "#5a7a9a" : "#d0e0ff" }}>
+                      <span className="block font-bold text-xs leading-tight" style={{ color: owned ? "#3a5040" : "#99a8a2" }}>
                         {upgrade.name}
-                        {owned && <span className="ml-1 text-[10px]" style={{ color: "#3ecf5c" }}>[EVOLVED]</span>}
+                        {owned && <span className="ml-1 text-[10px]" style={{ color: "#44aa44" }}>[MUTATED]</span>}
                       </span>
-                      <span className="block text-[10px] leading-tight" style={{ color: "#6090c0" }}>
-                        {locked ? "Requires previous tier" : upgrade.description}
+                      <span className="block text-[10px] leading-tight" style={{ color: "#3a5040" }}>
+                        {locked ? "Evolve previous tier first" : upgrade.description}
                       </span>
                     </span>
                     {!owned && !locked && (
-                      <span className="font-mono text-xs font-bold whitespace-nowrap shrink-0" style={{ color: upgrade.currency === "biomass" ? "#c060e0" : "#f0c040" }}>
+                      <span className="font-mono text-xs font-bold whitespace-nowrap shrink-0" style={{ color: upgrade.currency === "biomass" ? "#884488" : "#c89030" }}>
                         {upgrade.cost} {upgrade.currency === "biomass" ? "BM" : "NUT"}
                       </span>
                     )}

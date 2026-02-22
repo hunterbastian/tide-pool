@@ -4,10 +4,10 @@ import type { AdventureLog } from "@/lib/game-state"
 import { Skull, Sparkles, ScrollText, Utensils, Dna } from "lucide-react"
 
 const RESULT_CONFIG = {
-  devour:    { icon: Utensils,  color: "#3ecf5c", label: "Devoured!" },
-  flee:      { icon: Skull,     color: "#e04040", label: "Fled..." },
-  discovery: { icon: Sparkles,  color: "#f0c040", label: "Discovery!" },
-  evolution: { icon: Dna,       color: "#c060e0", label: "Evolution!" },
+  devour:    { icon: Utensils,  color: "#44aa44", label: "CONSUMED" },
+  flee:      { icon: Skull,     color: "#aa3030", label: "FLED" },
+  discovery: { icon: Sparkles,  color: "#c89030", label: "FOUND" },
+  evolution: { icon: Dna,       color: "#884488", label: "MUTATED" },
 }
 
 interface AdventureLogViewProps {
@@ -20,8 +20,8 @@ export function AdventureLogView({ logs }: AdventureLogViewProps) {
       <div className="retro-panel">
         <div className="retro-panel-header">Expedition Log</div>
         <div className="flex flex-col items-center gap-2 py-8">
-          <ScrollText className="h-8 w-8" style={{ color: "#2a4a7a" }} />
-          <p className="text-xs" style={{ color: "#5080a0" }}>No expeditions yet. Send your cell exploring!</p>
+          <ScrollText className="h-8 w-8" style={{ color: "#1e3028" }} />
+          <p className="text-xs font-mono" style={{ color: "#3a5040" }}>No kills yet. Send your cell into the murk.</p>
         </div>
       </div>
     )
@@ -39,22 +39,22 @@ export function AdventureLogView({ logs }: AdventureLogViewProps) {
           return (
             <div
               key={log.id}
-              className="flex items-start gap-2 rounded px-2 py-1.5 border border-[#1a2a3a]"
-              style={{ background: "#0a1628" }}
+              className="flex items-start gap-2 px-2 py-1.5 border border-[#121a14]"
+              style={{ background: "#040808", borderRadius: "2px" }}
             >
               <Icon className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: config.color }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] font-bold" style={{ color: config.color }}>{config.label}</span>
-                  <span className="text-[10px]" style={{ color: "#4a6a8a" }}>{log.biome.name}</span>
-                  <span className="ml-auto text-[10px] shrink-0" style={{ color: "#3a5a7a" }}>{timeAgo}</span>
+                  <span className="text-[10px]" style={{ color: "#2a3a32" }}>{log.biome.name}</span>
+                  <span className="ml-auto text-[10px] shrink-0" style={{ color: "#1e3028" }}>{timeAgo}</span>
                 </div>
-                <p className="text-[11px] leading-tight mt-0.5" style={{ color: "#8ab0d0" }}>{log.message}</p>
+                <p className="text-[11px] leading-tight mt-0.5" style={{ color: "#708880" }}>{log.message}</p>
                 <div className="flex gap-2 mt-0.5">
-                  <span className="font-mono text-[10px] font-bold" style={{ color: "#3ecf5c" }}>+{log.xpGained}xp</span>
-                  <span className="font-mono text-[10px] font-bold" style={{ color: "#f0c040" }}>+{log.nutrientsGained}nut</span>
+                  <span className="font-mono text-[10px] font-bold" style={{ color: "#44aa44" }}>+{log.xpGained}xp</span>
+                  <span className="font-mono text-[10px] font-bold" style={{ color: "#c89030" }}>+{log.nutrientsGained}nut</span>
                   {log.biomassGained > 0 && (
-                    <span className="font-mono text-[10px] font-bold" style={{ color: "#c060e0" }}>+{log.biomassGained}bm</span>
+                    <span className="font-mono text-[10px] font-bold" style={{ color: "#884488" }}>+{log.biomassGained}bm</span>
                   )}
                 </div>
               </div>

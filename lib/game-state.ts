@@ -69,70 +69,70 @@ export interface GameState {
 // ── Upgrades ─────────────────────────────────────────────────
 export const UPGRADES: Upgrade[] = [
   // Toxicity (attack)
-  { id: "tox-1", name: "Stinger Cell",     description: "Develops basic nematocysts",         cost: 10,  currency: "nutrients", stat: "toxicity",   boost: 2,  icon: "syringe",  tier: 1, visualKey: "stinger" },
-  { id: "tox-2", name: "Venom Sac",        description: "Secretes paralyzing enzymes",        cost: 50,  currency: "nutrients", stat: "toxicity",   boost: 5,  icon: "syringe",  tier: 2, visualKey: "venom" },
-  { id: "tox-3", name: "Acid Spray",       description: "Dissolves prey on contact",          cost: 200, currency: "biomass",   stat: "toxicity",   boost: 12, icon: "syringe",  tier: 3, visualKey: "acid" },
+  { id: "tox-1", name: "Barbed Stinger",   description: "Crude nematocysts that rip through tissue",  cost: 10,  currency: "nutrients", stat: "toxicity",   boost: 2,  icon: "syringe",  tier: 1, visualKey: "stinger" },
+  { id: "tox-2", name: "Venom Gland",      description: "Secretes a paralytic that dissolves nerves", cost: 50,  currency: "nutrients", stat: "toxicity",   boost: 5,  icon: "syringe",  tier: 2, visualKey: "venom" },
+  { id: "tox-3", name: "Corrosive Bile",   description: "Melts prey into soup on contact",            cost: 200, currency: "biomass",   stat: "toxicity",   boost: 12, icon: "syringe",  tier: 3, visualKey: "acid" },
   // Membrane (defense)
-  { id: "mem-1", name: "Lipid Layer",      description: "Thickens the cell wall",             cost: 10,  currency: "nutrients", stat: "membrane",   boost: 2,  icon: "shield",   tier: 1, visualKey: "lipid" },
-  { id: "mem-2", name: "Chitin Armor",     description: "Hard outer shell forms",             cost: 50,  currency: "nutrients", stat: "membrane",   boost: 5,  icon: "shield",   tier: 2, visualKey: "chitin" },
-  { id: "mem-3", name: "Spore Casing",     description: "Near-indestructible capsule",        cost: 200, currency: "biomass",   stat: "membrane",   boost: 12, icon: "shield",   tier: 3, visualKey: "spore" },
+  { id: "mem-1", name: "Scar Tissue",      description: "Thickened membrane, harder to puncture",     cost: 10,  currency: "nutrients", stat: "membrane",   boost: 2,  icon: "shield",   tier: 1, visualKey: "lipid" },
+  { id: "mem-2", name: "Chitin Plating",   description: "Calcified shell plates fused to your body",  cost: 50,  currency: "nutrients", stat: "membrane",   boost: 5,  icon: "shield",   tier: 2, visualKey: "chitin" },
+  { id: "mem-3", name: "Bone Casing",      description: "Nearly indestructible ossified hull",         cost: 200, currency: "biomass",   stat: "membrane",   boost: 12, icon: "shield",   tier: 3, visualKey: "spore" },
   // Motility (speed)
-  { id: "mot-1", name: "Cilia Band",       description: "Tiny hairs propel you faster",       cost: 10,  currency: "nutrients", stat: "motility",   boost: 2,  icon: "wind",     tier: 1, visualKey: "cilia" },
-  { id: "mot-2", name: "Flagellum+",       description: "A powerful whip-tail",               cost: 50,  currency: "nutrients", stat: "motility",   boost: 5,  icon: "wind",     tier: 2, visualKey: "flagellum" },
-  { id: "mot-3", name: "Jet Propulsion",   description: "Expels water at high velocity",      cost: 200, currency: "biomass",   stat: "motility",   boost: 12, icon: "wind",     tier: 3, visualKey: "jet" },
+  { id: "mot-1", name: "Cilia Fringe",     description: "Writhing hairs that claw through the murk",  cost: 10,  currency: "nutrients", stat: "motility",   boost: 2,  icon: "wind",     tier: 1, visualKey: "cilia" },
+  { id: "mot-2", name: "Lash Flagellum",   description: "A whip-tail that propels you violently",     cost: 50,  currency: "nutrients", stat: "motility",   boost: 5,  icon: "wind",     tier: 2, visualKey: "flagellum" },
+  { id: "mot-3", name: "Jet Siphon",       description: "Expels pressurized fluid for burst speed",   cost: 200, currency: "biomass",   stat: "motility",   boost: 12, icon: "wind",     tier: 3, visualKey: "jet" },
   // Adaptation (luck)
-  { id: "ada-1", name: "Photoreceptor",    description: "Primitive light sensing",            cost: 15,  currency: "nutrients", stat: "adaptation", boost: 2,  icon: "eye",      tier: 1, visualKey: "photo" },
-  { id: "ada-2", name: "Chemosensor",      description: "Detects nutrients from far away",    cost: 60,  currency: "nutrients", stat: "adaptation", boost: 5,  icon: "eye",      tier: 2, visualKey: "chemo" },
-  { id: "ada-3", name: "Neural Cluster",   description: "Proto-brain emerges!",               cost: 250, currency: "biomass",   stat: "adaptation", boost: 12, icon: "eye",      tier: 3, visualKey: "neural" },
+  { id: "ada-1", name: "Pit Organ",        description: "Crude heat-sensing pits along the membrane", cost: 15,  currency: "nutrients", stat: "adaptation", boost: 2,  icon: "eye",      tier: 1, visualKey: "photo" },
+  { id: "ada-2", name: "Chemoreceptor",    description: "Tastes blood in the water from afar",        cost: 60,  currency: "nutrients", stat: "adaptation", boost: 5,  icon: "eye",      tier: 2, visualKey: "chemo" },
+  { id: "ada-3", name: "Nerve Knot",       description: "A proto-brain writhes into existence",       cost: 250, currency: "biomass",   stat: "adaptation", boost: 12, icon: "eye",      tier: 3, visualKey: "neural" },
 ]
 
 // ── Idle income upgrades (stacks with base) ──────────────────
 export const IDLE_UPGRADES: Upgrade[] = [
-  { id: "idle-1", name: "Chloroplast",     description: "Photosynthesis: +0.5 nutrients/sec", cost: 30,  currency: "nutrients", stat: "adaptation", boost: 0, icon: "leaf", tier: 1, visualKey: "chloro" },
-  { id: "idle-2", name: "Mitochondria+",   description: "Powerhouse: +1.5 nutrients/sec",     cost: 120, currency: "nutrients", stat: "adaptation", boost: 0, icon: "zap",  tier: 2, visualKey: "mito" },
-  { id: "idle-3", name: "Symbiote",        description: "Mutualism: +4 nutrients/sec",        cost: 400, currency: "biomass",   stat: "adaptation", boost: 0, icon: "heart",tier: 3, visualKey: "symbiote" },
+  { id: "idle-1", name: "Stolen Chloroplast",  description: "Ripped from a dead alga. Leaks energy: +0.5/s",   cost: 30,  currency: "nutrients", stat: "adaptation", boost: 0, icon: "leaf", tier: 1, visualKey: "chloro" },
+  { id: "idle-2", name: "Bloated Mito",       description: "Overgrown powerhouse. Burns hot: +1.5/s",       cost: 120, currency: "nutrients", stat: "adaptation", boost: 0, icon: "zap",  tier: 2, visualKey: "mito" },
+  { id: "idle-3", name: "Parasite Bond",      description: "A creature fused to you. Feeds you both: +4/s", cost: 400, currency: "biomass",   stat: "adaptation", boost: 0, icon: "heart",tier: 3, visualKey: "symbiote" },
 ]
 
 export const IDLE_RATES = [0.5, 1.5, 4] // nutrients per sec per idle upgrade tier
 
 // ── Biomes ───────────────────────────────────────────────────
 export const BIOMES: Biome[] = [
-  { id: "tidepool",    name: "Tide Pool",          description: "Warm, shallow water teeming with microbes",     requiredLevel: 1,  baseDuration: 8,  baseReward: { xp: 15, nutrients: 8,  biomass: 0 }, dangerLevel: 1, color: "#40c8e0" },
-  { id: "kelp",        name: "Kelp Forest",        description: "Dense algae forests hide predators and prey",   requiredLevel: 3,  baseDuration: 12, baseReward: { xp: 30, nutrients: 15, biomass: 1 }, dangerLevel: 2, color: "#40b060" },
-  { id: "coral",       name: "Coral Reef",         description: "Colorful and dangerous in equal measure",       requiredLevel: 5,  baseDuration: 15, baseReward: { xp: 50, nutrients: 25, biomass: 2 }, dangerLevel: 3, color: "#e07080" },
-  { id: "vent",        name: "Hydrothermal Vent",  description: "Superheated water and exotic chemotrophs",      requiredLevel: 8,  baseDuration: 20, baseReward: { xp: 80, nutrients: 40, biomass: 4 }, dangerLevel: 4, color: "#e06030" },
-  { id: "abyss",       name: "Abyssal Trench",     description: "Crushing pressure, bioluminescent horrors",     requiredLevel: 12, baseDuration: 25, baseReward: { xp: 120, nutrients: 60, biomass: 7 }, dangerLevel: 5, color: "#3040a0" },
-  { id: "primordial",  name: "Primordial Core",    description: "The origin of all life... and death",           requiredLevel: 16, baseDuration: 30, baseReward: { xp: 200, nutrients: 100, biomass: 12 }, dangerLevel: 6, color: "#a030c0" },
+  { id: "tidepool",    name: "Stagnant Pool",      description: "Warm, fetid water. Easy prey rots in the shallows",    requiredLevel: 1,  baseDuration: 8,  baseReward: { xp: 15, nutrients: 8,  biomass: 0 }, dangerLevel: 1, color: "#3a8868" },
+  { id: "kelp",        name: "Rotting Kelp Bed",   description: "Decomposing algae forests. Predators lurk within",  requiredLevel: 3,  baseDuration: 12, baseReward: { xp: 30, nutrients: 15, biomass: 1 }, dangerLevel: 2, color: "#4a7040" },
+  { id: "coral",       name: "Bone Reef",          description: "Calcified remains of dead colonies. Toxic and sharp",  requiredLevel: 5,  baseDuration: 15, baseReward: { xp: 50, nutrients: 25, biomass: 2 }, dangerLevel: 3, color: "#8a5050" },
+  { id: "vent",        name: "Sulfur Vent",        description: "Scalding, poisonous water. Only the adapted survive", requiredLevel: 8,  baseDuration: 20, baseReward: { xp: 80, nutrients: 40, biomass: 4 }, dangerLevel: 4, color: "#a06820" },
+  { id: "abyss",       name: "Crush Depth",        description: "Lightless void. Pressure warps flesh. Things hunt here", requiredLevel: 12, baseDuration: 25, baseReward: { xp: 120, nutrients: 60, biomass: 7 }, dangerLevel: 5, color: "#2a3060" },
+  { id: "primordial",  name: "The Maw",            description: "Where it all began. Where most things end",            requiredLevel: 16, baseDuration: 30, baseReward: { xp: 200, nutrients: 100, biomass: 12 }, dangerLevel: 6, color: "#602040" },
 ]
 
 // ── Adventure Events ─────────────────────────────────────────
 const ADVENTURE_EVENTS = {
   devour: [
-    "engulfed a rival microbe in one gulp!",
-    "dissolved a bacterial colony with acid!",
-    "caught a fleeing paramecium!",
-    "ambushed prey hiding in the sediment!",
-    "overpowered a competing organism!",
-    "consumed a massive food particle!",
+    "tore a rival apart membrane-first.",
+    "dissolved a bacterial colony. Nothing remained.",
+    "cornered a fleeing paramecium. It didn't escape.",
+    "ambushed something hiding in the sediment. It screamed chemically.",
+    "crushed a competitor. Absorbed its nutrients while it was still alive.",
+    "swallowed a massive food particle whole. Your body distended.",
   ],
   discovery: [
-    "found a cluster of amino acids!",
-    "discovered a mineral-rich deposit!",
-    "stumbled upon a nutrient geyser!",
-    "located an ancient organic compound!",
+    "found a rotting cluster of amino acids. Still useful.",
+    "discovered a mineral-rich deposit leaking from cracked rock.",
+    "stumbled into a nutrient geyser. Gorged until bloated.",
+    "located ancient organic compounds sealed in dead tissue.",
   ],
   evolution: [
-    "felt a strange mutation taking hold...",
-    "absorbed foreign DNA and grew stronger!",
-    "witnessed a fellow organism evolve!",
-    "discovered a new survival strategy!",
-    "adapted to the extreme conditions!",
+    "something shifted inside you. A mutation took root...",
+    "absorbed foreign DNA from a corpse. You feel... different.",
+    "watched a fellow organism split and change. You understood.",
+    "survived something that should have killed you. You adapted.",
+    "the environment broke you. You rebuilt yourself stronger.",
   ],
   flee: [
-    "was chased off by a larger predator...",
-    "got caught in a toxic current...",
-    "bumped into a sea urchin...",
-    "was outmaneuvered by a faster organism...",
+    "something massive moved in the dark. You fled.",
+    "caught in a toxic plume. Membrane blistering. Retreated.",
+    "a predator's tendrils grazed you. You barely escaped.",
+    "outmaneuvered by something faster. It let you go. This time.",
   ],
 }
 

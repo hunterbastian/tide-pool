@@ -30,7 +30,7 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
       <div className="retro-panel-header flex items-center justify-between">
         <span>Biome Explorer</span>
         {state.isAdventuring && (
-          <span className="flex items-center gap-1.5 text-[#3ecf5c] text-xs normal-case tracking-normal">
+          <span className="flex items-center gap-1.5 text-[#44aa44] text-xs normal-case tracking-normal">
             <Timer className="h-3.5 w-3.5 animate-spin" style={{ animationDuration: "3s" }} />
             {timeLeft > 0 ? formatTime(timeLeft) : "Returning..."}
           </span>
@@ -39,16 +39,16 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
 
       {/* Active adventure banner */}
       {state.isAdventuring && state.currentBiome && (
-        <div className="mx-3 mt-3 rounded border border-[#3ecf5c]/30 px-3 py-2" style={{ background: "linear-gradient(180deg, #1a4030 0%, #0f2a20 100%)" }}>
-          <p className="text-center text-xs font-bold" style={{ color: "#3ecf5c" }}>
-            Exploring {state.currentBiome.name}...
+        <div className="mx-3 mt-3 border border-[#1e3028] px-3 py-2" style={{ background: "linear-gradient(180deg, #0e1a12 0%, #080f0a 100%)", borderRadius: "2px" }}>
+          <p className="text-center text-xs font-bold font-mono uppercase tracking-wider" style={{ color: "#44aa44", textShadow: "0 0 4px rgba(68,170,68,0.2)" }}>
+            Hunting in {state.currentBiome.name}...
           </p>
           <div className="mt-1 flex justify-center gap-1">
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
                 className="inline-block h-1.5 w-1.5 rounded-full animate-bounce"
-                style={{ background: "#3ecf5c", animationDelay: `${i * 0.2}s` }}
+                style={{ background: "#44aa44", animationDelay: `${i * 0.2}s` }}
               />
             ))}
           </div>
@@ -66,21 +66,22 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
               key={biome.id}
               onClick={() => !state.isAdventuring && unlocked && onAdventure(biome)}
               disabled={state.isAdventuring || !unlocked}
-              className={`flex flex-col gap-1.5 rounded px-3 py-2.5 text-left transition-all border-2 ${
+              className={`flex flex-col gap-1.5 px-3 py-2.5 text-left transition-all border-2 ${
                 isCurrent
-                  ? "border-[#3ecf5c] bg-[#1a4030]"
+                  ? "border-[#44aa44] bg-[#0e1a12]"
                   : unlocked && !state.isAdventuring
-                  ? "border-[#2a4a7a] hover:border-[#3a6aaa] cursor-pointer"
+                  ? "border-[#1e3028] hover:border-[#2a4a30] cursor-pointer"
                   : unlocked
-                  ? "border-[#1a2a3a] opacity-50"
-                  : "border-[#1a2030] opacity-30 cursor-not-allowed"
+                  ? "border-[#121a14] opacity-50"
+                  : "border-[#0a1010] opacity-25 cursor-not-allowed"
               }`}
               style={{
+                borderRadius: "2px",
                 background: isCurrent
                   ? undefined
                   : unlocked
-                  ? `linear-gradient(90deg, ${biome.color}15, transparent)`
-                  : "#0a1020",
+                  ? `linear-gradient(90deg, ${biome.color}10, transparent)`
+                  : "#040808",
               }}
             >
               <div className="flex items-center justify-between">
@@ -91,34 +92,34 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
                       style={{ background: biome.color, boxShadow: `0 0 6px ${biome.color}80` }}
                     />
                   ) : (
-                    <Lock className="w-3 h-3 shrink-0" style={{ color: "#3a5a7a" }} />
+                    <Lock className="w-3 h-3 shrink-0" style={{ color: "#2a3a32" }} />
                   )}
-                  <span className="font-bold text-xs" style={{ color: unlocked ? "#d0e0ff" : "#3a5a7a" }}>
+                  <span className="font-bold text-xs" style={{ color: unlocked ? "#99a8a2" : "#2a3a32" }}>
                     {biome.name}
                   </span>
                 </div>
                 {unlocked && (
-                  <span className="font-mono text-[10px]" style={{ color: "#6090c0" }}>
+                  <span className="font-mono text-[10px]" style={{ color: "#4a6058" }}>
                     ~{biome.baseDuration}s
                   </span>
                 )}
               </div>
 
-              <p className="text-[10px] leading-tight" style={{ color: "#5080a0" }}>
+              <p className="text-[10px] leading-tight" style={{ color: "#3a5040" }}>
                 {unlocked ? biome.description : `Requires Level ${biome.requiredLevel}`}
               </p>
 
               {unlocked && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-[10px] font-bold" style={{ color: "#3ecf5c" }}>+{biome.baseReward.xp}xp</span>
-                    <span className="font-mono text-[10px] font-bold" style={{ color: "#f0c040" }}>+{biome.baseReward.nutrients}nut</span>
+                    <span className="font-mono text-[10px] font-bold" style={{ color: "#44aa44" }}>+{biome.baseReward.xp}xp</span>
+                    <span className="font-mono text-[10px] font-bold" style={{ color: "#c89030" }}>+{biome.baseReward.nutrients}nut</span>
                     {biome.baseReward.biomass > 0 && (
-                      <span className="font-mono text-[10px] font-bold" style={{ color: "#c060e0" }}>+{biome.baseReward.biomass}bm</span>
+                      <span className="font-mono text-[10px] font-bold" style={{ color: "#884488" }}>+{biome.baseReward.biomass}bm</span>
                     )}
                   </div>
                   {/* Success estimate */}
-                  <span className="font-mono text-[10px]" style={{ color: successEst > 60 ? "#3ecf5c" : successEst > 35 ? "#f0c040" : "#e04040" }}>
+                  <span className="font-mono text-[10px]" style={{ color: successEst > 60 ? "#44aa44" : successEst > 35 ? "#c89030" : "#aa3030" }}>
                     {successEst}%
                   </span>
                 </div>
@@ -132,7 +133,7 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
                       key={i}
                       className="h-1 flex-1 rounded-sm"
                       style={{
-                        background: i < biome.dangerLevel ? biome.color : "#1a2a3a",
+                        background: i < biome.dangerLevel ? biome.color : "#0a1010",
                         opacity: i < biome.dangerLevel ? 0.7 : 1,
                       }}
                     />
