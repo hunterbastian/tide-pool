@@ -29,21 +29,37 @@ export function LevelUpToast({ level, show, onDone }: LevelUpToastProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
       <div
         className={cn(
-          "flex flex-col items-center gap-3 rounded-2xl bg-card border-2 border-primary/30 px-10 py-8 shadow-2xl transition-all duration-300",
+          "flex flex-col items-center gap-3 rounded px-10 py-8 transition-all duration-300",
           visible ? "scale-100 opacity-100" : "scale-75 opacity-0"
         )}
+        style={{
+          background: "linear-gradient(180deg, #1a4040 0%, #0a2030 100%)",
+          border: "3px solid #3ecf5c",
+          boxShadow: "0 0 30px rgba(62,207,92,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
+        }}
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
-          <span className="text-3xl font-bold text-primary">{level}</span>
+        <div
+          className="flex h-16 w-16 items-center justify-center rounded-full"
+          style={{
+            background: "linear-gradient(180deg, #4ade60, #22a83a)",
+            border: "3px solid #16702a",
+            boxShadow: "0 0 16px rgba(62,207,92,0.5)",
+          }}
+        >
+          <span className="font-mono text-2xl font-bold" style={{ color: "#fff", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+            {level}
+          </span>
         </div>
-        <p className="text-2xl font-bold text-foreground">Level Up!</p>
-        <p className="text-sm text-muted-foreground">Your robot grew stronger!</p>
+        <p className="text-xl font-bold" style={{ color: "#3ecf5c", textShadow: "0 0 8px rgba(62,207,92,0.4)" }}>
+          EVOLUTION!
+        </p>
+        <p className="text-xs" style={{ color: "#6090c0" }}>Your cell grew stronger!</p>
         <div className="flex gap-1 mt-1">
           {[...Array(5)].map((_, i) => (
             <span
               key={i}
-              className="inline-block h-1.5 w-1.5 rounded-full bg-primary animate-ping"
-              style={{ animationDelay: `${i * 0.15}s`, animationDuration: "1s" }}
+              className="inline-block h-1.5 w-1.5 rounded-full animate-ping"
+              style={{ background: "#3ecf5c", animationDelay: `${i * 0.15}s`, animationDuration: "1s" }}
             />
           ))}
         </div>

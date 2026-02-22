@@ -2,15 +2,15 @@
 
 import { cn } from "@/lib/utils"
 
-const ROBOT_COLORS = [
-  { body: "#4ECDC4", accent: "#3BA89F", highlight: "#A8F0EA", membrane: "#3BB8B0" },
-  { body: "#FF6B6B", accent: "#CC5555", highlight: "#FFB3B3", membrane: "#E05A5A" },
-  { body: "#FFB84D", accent: "#CC9340", highlight: "#FFD999", membrane: "#E0A040" },
-  { body: "#7C83FD", accent: "#5F65CC", highlight: "#B5B9FE", membrane: "#6A70E0" },
-  { body: "#95E66A", accent: "#76B854", highlight: "#C5F0A8", membrane: "#82CC5C" },
+const CELL_COLORS = [
+  { body: "#4ECDC4", accent: "#2BA89F", highlight: "#A8F0EA", membrane: "#3BB8B0", glow: "rgba(78,205,196,0.4)" },
+  { body: "#FF6B6B", accent: "#CC4444", highlight: "#FFB3B3", membrane: "#E05A5A", glow: "rgba(255,107,107,0.4)" },
+  { body: "#FFB84D", accent: "#CC8820", highlight: "#FFD999", membrane: "#E0A040", glow: "rgba(255,184,77,0.4)" },
+  { body: "#7C83FD", accent: "#5555DD", highlight: "#B5B9FE", membrane: "#6A70E0", glow: "rgba(124,131,253,0.4)" },
+  { body: "#95E66A", accent: "#60BB33", highlight: "#C5F0A8", membrane: "#82CC5C", glow: "rgba(149,230,106,0.4)" },
 ]
 
-const HATS = [
+const APPENDAGES = [
   null,
   "flagellum",
   "eyestalk",
@@ -19,12 +19,13 @@ const HATS = [
   "proboscis",
 ]
 
-interface RobotAvatarProps {
+interface CellAvatarProps {
   colorIndex: number
   hatIndex: number
   isAdventuring?: boolean
   size?: number
   className?: string
+  ownedUpgrades?: string[]
 }
 
 export function RobotAvatar({
@@ -33,9 +34,28 @@ export function RobotAvatar({
   isAdventuring = false,
   size = 200,
   className,
-}: RobotAvatarProps) {
-  const color = ROBOT_COLORS[colorIndex % ROBOT_COLORS.length]
-  const hat = HATS[hatIndex % HATS.length]
+  ownedUpgrades = [],
+}: CellAvatarProps) {
+  const color = CELL_COLORS[colorIndex % CELL_COLORS.length]
+  const appendage = APPENDAGES[hatIndex % APPENDAGES.length]
+
+  // Determine visual evolution based on owned upgrades
+  const has = (id: string) => ownedUpgrades.includes(id)
+  const hasToxin = has("tox-1") || has("tox-2") || has("tox-3")
+  const hasAcid = has("tox-3")
+  const hasChitin = has("mem-2") || has("mem-3")
+  const hasSporeCasing = has("mem-3")
+  const hasCilia = has("mot-1")
+  const hasFlagellum = has("mot-2") || has("mot-3")
+  const hasJet = has("mot-3")
+  const hasEye = has("ada-1") || has("ada-2") || has("ada-3")
+  const hasNeural = has("ada-3")
+  const hasChloro = has("idle-1")
+  const hasMito = has("idle-2")
+  const hasSymbiote = has("idle-3")
+
+  // Membrane thickness based on defense upgrades
+  const membraneWidth = hasChitin ? (hasSporeCasing ? 5 : 3.5) : 2
 
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)}>
@@ -43,10 +63,8 @@ export function RobotAvatar({
         width={size}
         height={size}
         viewBox="0 0 200 200"
-        className={cn(
-          "drop-shadow-lg",
-          isAdventuring && "animate-bounce"
-        )}
+        className={cn(isAdventuring && "animate-bounce")}
+        style={{ filter: `drop-shadow(0 0 8px ${color.glow})` }}
       >
         <defs>
           <radialGradient id={`bodyGrad-${colorIndex}`} cx="40%" cy="35%">
@@ -58,228 +76,238 @@ export function RobotAvatar({
             <stop offset="0%" stopColor={color.highlight} stopOpacity="0.5" />
             <stop offset="100%" stopColor={color.body} stopOpacity="0.2" />
           </radialGradient>
-          <filter id="goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur" />
-            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo" />
+          {/* Glow filter for toxin spots */}
+          <filter id="toxGlow">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
+          {/* Chitin texture pattern */}
+          {hasChitin && (
+            <pattern id="chitinPattern" width="8" height="8" patternUnits="userSpaceOnUse">
+              <rect width="8" height="8" fill="none" />
+              <circle cx="4" cy="4" r="0.8" fill={color.accent} opacity="0.3" />
+            </pattern>
+          )}
         </defs>
 
-        {/* Appendage - flagellum (wavy tail) */}
-        {hat === "flagellum" && (
-          <path
-            d="M100,160 Q85,175 95,190 Q105,205 90,215"
-            stroke={color.accent}
-            strokeWidth="3"
-            fill="none"
-            strokeLinecap="round"
-            opacity="0.8"
-          >
-            <animate
-              attributeName="d"
-              values="M100,160 Q85,175 95,190 Q105,205 90,215;M100,160 Q115,175 105,190 Q95,205 110,215;M100,160 Q85,175 95,190 Q105,205 90,215"
-              dur="0.8s"
-              repeatCount="indefinite"
-            />
-          </path>
-        )}
-
-        {/* Appendage - eyestalk */}
-        {hat === "eyestalk" && (
+        {/* === FLAGELLUM (appendage or motility upgrade) === */}
+        {(appendage === "flagellum" || hasFlagellum) && (
           <g>
-            <path d="M100,50 Q95,30 90,18" stroke={color.accent} strokeWidth="3.5" fill="none" strokeLinecap="round">
+            <path
+              d="M100,155 Q85,175 95,190 Q105,205 90,215 Q80,220 85,230"
+              stroke={hasJet ? "#40e0ff" : color.accent}
+              strokeWidth={hasJet ? 4 : 3}
+              fill="none"
+              strokeLinecap="round"
+              opacity="0.8"
+            >
               <animate
                 attributeName="d"
-                values="M100,50 Q95,30 90,18;M100,50 Q105,28 108,16;M100,50 Q95,30 90,18"
-                dur="2.5s"
+                values="M100,155 Q85,175 95,190 Q105,205 90,215 Q80,220 85,230;M100,155 Q115,175 105,190 Q95,205 110,215 Q120,220 115,230;M100,155 Q85,175 95,190 Q105,205 90,215 Q80,220 85,230"
+                dur={hasJet ? "0.3s" : "0.8s"}
                 repeatCount="indefinite"
               />
             </path>
+            {hasJet && (
+              <g opacity="0.5">
+                <circle cx="85" cy="230" r="3" fill="#40e0ff">
+                  <animate attributeName="r" values="3;6;3" dur="0.4s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.5;0.1;0.5" dur="0.4s" repeatCount="indefinite" />
+                </circle>
+              </g>
+            )}
+          </g>
+        )}
+
+        {/* === EYESTALK appendage === */}
+        {appendage === "eyestalk" && (
+          <g>
+            <path d="M100,48 Q95,30 90,18" stroke={color.accent} strokeWidth="3.5" fill="none" strokeLinecap="round">
+              <animate attributeName="d" values="M100,48 Q95,30 90,18;M100,48 Q105,28 108,16;M100,48 Q95,30 90,18" dur="2.5s" repeatCount="indefinite" />
+            </path>
             <circle cx="90" cy="16" r="7" fill="white" stroke={color.accent} strokeWidth="1.5">
               <animate attributeName="cx" values="90;108;90" dur="2.5s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="16;14;16" dur="2.5s" repeatCount="indefinite" />
             </circle>
             <circle cx="90" cy="16" r="3.5" fill="#2D2D2D">
               <animate attributeName="cx" values="90;108;90" dur="2.5s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="16;14;16" dur="2.5s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="91" cy="14" r="1.5" fill="white">
-              <animate attributeName="cx" values="91;109;91" dur="2.5s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="14;12;14" dur="2.5s" repeatCount="indefinite" />
             </circle>
           </g>
         )}
 
-        {/* Appendage - spikes */}
-        {hat === "spikes" && (
+        {/* === SPIKES appendage === */}
+        {appendage === "spikes" && (
           <g>
-            <ellipse cx="100" cy="40" rx="5" ry="12" fill={color.accent} opacity="0.7" transform="rotate(0 100 55)" />
-            <ellipse cx="78" cy="50" rx="4" ry="10" fill={color.accent} opacity="0.6" transform="rotate(-30 78 60)" />
-            <ellipse cx="122" cy="50" rx="4" ry="10" fill={color.accent} opacity="0.6" transform="rotate(30 122 60)" />
-            <ellipse cx="68" cy="70" rx="3.5" ry="8" fill={color.accent} opacity="0.5" transform="rotate(-55 68 75)" />
-            <ellipse cx="132" cy="70" rx="3.5" ry="8" fill={color.accent} opacity="0.5" transform="rotate(55 132 75)" />
+            <polygon points="100,30 96,48 104,48" fill={color.accent} opacity="0.75" />
+            <polygon points="72,42 76,58 68,58" fill={color.accent} opacity="0.65" transform="rotate(-25 72 50)" />
+            <polygon points="128,42 132,58 124,58" fill={color.accent} opacity="0.65" transform="rotate(25 128 50)" />
+            <polygon points="56,68 60,80 52,80" fill={color.accent} opacity="0.55" transform="rotate(-50 56 74)" />
+            <polygon points="144,68 148,80 140,80" fill={color.accent} opacity="0.55" transform="rotate(50 144 74)" />
           </g>
         )}
 
-        {/* Appendage - cilia (little hairs all around) */}
-        {hat === "cilia" && (
-          <g opacity="0.6">
-            {Array.from({ length: 16 }).map((_, i) => {
-              const angle = (i / 16) * Math.PI * 2 - Math.PI / 2
-              const cx = 100
-              const cy = 95
-              const rx = 52
-              const ry = 58
+        {/* === CILIA appendage or upgrade === */}
+        {(appendage === "cilia" || hasCilia) && (
+          <g opacity="0.55">
+            {Array.from({ length: 18 }).map((_, i) => {
+              const angle = (i / 18) * Math.PI * 2 - Math.PI / 2
+              const cx = 100, cy = 95, rx = 50, ry = 56
               const x1 = cx + rx * Math.cos(angle)
               const y1 = cy + ry * Math.sin(angle)
-              const x2 = cx + (rx + 12) * Math.cos(angle)
-              const y2 = cy + (ry + 12) * Math.sin(angle)
+              const x2 = cx + (rx + 10) * Math.cos(angle)
+              const y2 = cy + (ry + 10) * Math.sin(angle)
               return (
-                <line
-                  key={i}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={color.accent}
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <animate
-                    attributeName="x2"
-                    values={`${x2};${cx + (rx + 15) * Math.cos(angle + 0.1)};${x2}`}
-                    dur={`${0.6 + (i % 3) * 0.15}s`}
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="y2"
-                    values={`${y2};${cy + (ry + 15) * Math.sin(angle + 0.1)};${y2}`}
-                    dur={`${0.6 + (i % 3) * 0.15}s`}
-                    repeatCount="indefinite"
-                  />
+                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color.accent} strokeWidth="1.5" strokeLinecap="round">
+                  <animate attributeName="x2" values={`${x2};${cx + (rx + 14) * Math.cos(angle + 0.08)};${x2}`} dur={`${0.5 + (i % 4) * 0.12}s`} repeatCount="indefinite" />
+                  <animate attributeName="y2" values={`${y2};${cy + (ry + 14) * Math.sin(angle + 0.08)};${y2}`} dur={`${0.5 + (i % 4) * 0.12}s`} repeatCount="indefinite" />
                 </line>
               )
             })}
           </g>
         )}
 
-        {/* Appendage - proboscis (feeding tube) */}
-        {hat === "proboscis" && (
+        {/* === PROBOSCIS appendage === */}
+        {appendage === "proboscis" && (
           <g>
-            <path
-              d="M110,110 Q135,108 155,95 Q165,88 170,80"
-              stroke={color.accent}
-              strokeWidth="5"
-              fill="none"
-              strokeLinecap="round"
-            >
-              <animate
-                attributeName="d"
-                values="M110,110 Q135,108 155,95 Q165,88 170,80;M110,110 Q135,115 158,108 Q168,102 172,92;M110,110 Q135,108 155,95 Q165,88 170,80"
-                dur="2s"
-                repeatCount="indefinite"
-              />
+            <path d="M112,108 Q135,106 155,93 Q165,86 172,78" stroke={color.accent} strokeWidth="5" fill="none" strokeLinecap="round">
+              <animate attributeName="d" values="M112,108 Q135,106 155,93 Q165,86 172,78;M112,108 Q135,113 158,106 Q168,100 174,90;M112,108 Q135,106 155,93 Q165,86 172,78" dur="2s" repeatCount="indefinite" />
             </path>
-            <circle cx="170" cy="80" r="3" fill={color.highlight}>
-              <animate attributeName="cx" values="170;172;170" dur="2s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="80;92;80" dur="2s" repeatCount="indefinite" />
+            <circle cx="172" cy="78" r="3" fill={color.highlight}>
+              <animate attributeName="cx" values="172;174;172" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="cy" values="78;90;78" dur="2s" repeatCount="indefinite" />
             </circle>
           </g>
         )}
 
-        {/* Pseudopod nubs (little blobby feet) */}
-        <ellipse cx="80" cy="152" rx="14" ry="8" fill={color.body} opacity="0.7">
-          <animate
-            attributeName="rx"
-            values="14;16;14"
-            dur="1.5s"
-            repeatCount="indefinite"
-          />
+        {/* === Pseudopod feet === */}
+        <ellipse cx="80" cy="148" rx="14" ry="8" fill={color.body} opacity="0.65">
+          <animate attributeName="rx" values="14;16;14" dur="1.5s" repeatCount="indefinite" />
         </ellipse>
-        <ellipse cx="120" cy="152" rx="14" ry="8" fill={color.body} opacity="0.7">
-          <animate
-            attributeName="rx"
-            values="14;16;14"
-            dur="1.5s"
-            begin="0.75s"
-            repeatCount="indefinite"
-          />
+        <ellipse cx="120" cy="148" rx="14" ry="8" fill={color.body} opacity="0.65">
+          <animate attributeName="rx" values="14;16;14" dur="1.5s" begin="0.75s" repeatCount="indefinite" />
         </ellipse>
 
-        {/* Little arm-like pseudopods */}
-        <ellipse cx="48" cy="95" rx="10" ry="16" fill={color.body} opacity="0.65" transform="rotate(-20 48 95)">
+        {/* === Arm pseudopods === */}
+        <ellipse cx="48" cy="95" rx="10" ry="16" fill={color.body} opacity="0.6" transform="rotate(-20 48 95)">
           {isAdventuring && (
             <animateTransform attributeName="transform" type="rotate" values="-20 48 95;-35 48 95;-5 48 95;-20 48 95" dur="0.6s" repeatCount="indefinite" />
           )}
         </ellipse>
-        <ellipse cx="152" cy="95" rx="10" ry="16" fill={color.body} opacity="0.65" transform="rotate(20 152 95)">
+        <ellipse cx="152" cy="95" rx="10" ry="16" fill={color.body} opacity="0.6" transform="rotate(20 152 95)">
           {isAdventuring && (
             <animateTransform attributeName="transform" type="rotate" values="20 152 95;5 152 95;35 152 95;20 152 95" dur="0.6s" repeatCount="indefinite" />
           )}
         </ellipse>
 
-        {/* Main body - organic blobby shape */}
+        {/* === MAIN BODY === */}
         <ellipse
-          cx="100"
-          cy="95"
-          rx="48"
-          ry="55"
+          cx="100" cy="95" rx="48" ry="55"
           fill={`url(#bodyGrad-${colorIndex})`}
-          stroke={color.membrane}
-          strokeWidth="2.5"
+          stroke={hasSporeCasing ? "#c0a060" : color.membrane}
+          strokeWidth={membraneWidth}
           opacity="0.9"
         >
-          <animate
-            attributeName="rx"
-            values="48;50;47;50;48"
-            dur="3s"
-            repeatCount="indefinite"
-          />
-          <animate
-            attributeName="ry"
-            values="55;53;56;53;55"
-            dur="3s"
-            repeatCount="indefinite"
-          />
+          <animate attributeName="rx" values="48;50;47;50;48" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="ry" values="55;53;56;53;55" dur="3s" repeatCount="indefinite" />
         </ellipse>
 
-        {/* Inner organelles / nucleus */}
-        <ellipse cx="95" cy="108" rx="16" ry="14" fill={`url(#innerGrad-${colorIndex})`} opacity="0.5">
+        {/* Chitin overlay */}
+        {hasChitin && (
+          <ellipse cx="100" cy="95" rx="47" ry="54" fill="url(#chitinPattern)" opacity="0.4">
+            <animate attributeName="rx" values="47;49;46;49;47" dur="3s" repeatCount="indefinite" />
+            <animate attributeName="ry" values="54;52;55;52;54" dur="3s" repeatCount="indefinite" />
+          </ellipse>
+        )}
+
+        {/* === CHLOROPLASTS (green spots) === */}
+        {hasChloro && (
+          <g opacity="0.5">
+            <circle cx="80" cy="115" r="5" fill="#40c040" />
+            <circle cx="115" cy="120" r="4" fill="#50d050" />
+            <circle cx="95" cy="130" r="3.5" fill="#40c040" />
+          </g>
+        )}
+
+        {/* === MITOCHONDRIA (orange/red organelles) === */}
+        {hasMito && (
+          <g opacity="0.45">
+            <ellipse cx="108" cy="110" rx="6" ry="3.5" fill="#e08040" transform="rotate(20 108 110)">
+              <animate attributeName="cx" values="108;112;108" dur="4s" repeatCount="indefinite" />
+            </ellipse>
+            <ellipse cx="88" cy="120" rx="5" ry="3" fill="#d07030" transform="rotate(-15 88 120)">
+              <animate attributeName="cy" values="120;116;120" dur="3.5s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        )}
+
+        {/* === SYMBIOTE (glowing internal buddy) === */}
+        {hasSymbiote && (
+          <g>
+            <circle cx="100" cy="115" r="8" fill="#e040a0" opacity="0.25">
+              <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="100" cy="115" r="4" fill="#ff60c0" opacity="0.5">
+              <animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="98" cy="113" r="1.5" fill="white" opacity="0.7" />
+          </g>
+        )}
+
+        {/* === Inner nucleus / organelles === */}
+        <ellipse cx="95" cy="108" rx="16" ry="14" fill={`url(#innerGrad-${colorIndex})`} opacity={hasNeural ? "0.7" : "0.5"}>
           <animate attributeName="cx" values="95;98;93;95" dur="5s" repeatCount="indefinite" />
-          <animate attributeName="cy" values="108;112;106;108" dur="5s" repeatCount="indefinite" />
         </ellipse>
+        {hasNeural && (
+          <g opacity="0.4">
+            <line x1="95" y1="108" x2="80" y2="100" stroke="#fff" strokeWidth="1" />
+            <line x1="95" y1="108" x2="110" y2="98" stroke="#fff" strokeWidth="1" />
+            <line x1="95" y1="108" x2="100" y2="125" stroke="#fff" strokeWidth="1" />
+            <line x1="95" y1="108" x2="82" y2="118" stroke="#fff" strokeWidth="1" />
+          </g>
+        )}
         <circle cx="112" cy="118" r="6" fill={color.highlight} opacity="0.25">
           <animate attributeName="cx" values="112;108;114;112" dur="4s" repeatCount="indefinite" />
         </circle>
-        <circle cx="82" cy="120" r="4" fill={color.highlight} opacity="0.2">
-          <animate attributeName="cy" values="120;116;122;120" dur="3.5s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="105" cy="125" r="3" fill={color.highlight} opacity="0.2">
-          <animate attributeName="cx" values="105;108;103;105" dur="3s" repeatCount="indefinite" />
-        </circle>
+        <circle cx="82" cy="120" r="4" fill={color.highlight} opacity="0.2" />
 
-        {/* Membrane highlight / shine */}
-        <ellipse cx="82" cy="68" rx="22" ry="10" fill="white" opacity="0.15" transform="rotate(-15 82 68)" />
+        {/* === TOXIN SPOTS === */}
+        {hasToxin && (
+          <g filter={hasAcid ? "url(#toxGlow)" : undefined}>
+            <circle cx="70" cy="80" r="3" fill={hasAcid ? "#c0ff40" : "#c040c0"} opacity="0.6">
+              <animate attributeName="opacity" values="0.6;0.9;0.6" dur="1.5s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="130" cy="85" r="2.5" fill={hasAcid ? "#c0ff40" : "#c040c0"} opacity="0.5">
+              <animate attributeName="opacity" values="0.5;0.8;0.5" dur="1.8s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="90" cy="135" r="2" fill={hasAcid ? "#c0ff40" : "#c040c0"} opacity="0.4" />
+          </g>
+        )}
 
-        {/* Eyes - big cute cell eyes */}
+        {/* Membrane shine */}
+        <ellipse cx="82" cy="68" rx="22" ry="10" fill="white" opacity="0.12" transform="rotate(-15 82 68)" />
+
+        {/* === EYES === */}
         <g>
           {/* Left eye */}
-          <ellipse cx="84" cy="82" rx="14" ry="16" fill="white" stroke={color.membrane} strokeWidth="1.5" />
+          <ellipse cx="84" cy="82" rx={hasEye ? 15 : 13} ry={hasEye ? 17 : 15} fill="white" stroke={color.membrane} strokeWidth="1.5" />
           <ellipse cx="87" cy="81" rx="8" ry="10" fill="#2D2D2D">
             <animate attributeName="cx" values="87;90;87;84;87" dur="4s" repeatCount="indefinite" />
           </ellipse>
           <circle cx="90" cy="77" r="3.5" fill="white" opacity="0.9" />
-          <circle cx="84" cy="85" r="1.5" fill="white" opacity="0.5" />
+          {hasEye && <circle cx="84" cy="85" r="1.5" fill={color.highlight} opacity="0.6" />}
 
           {/* Right eye */}
-          <ellipse cx="116" cy="82" rx="14" ry="16" fill="white" stroke={color.membrane} strokeWidth="1.5" />
+          <ellipse cx="116" cy="82" rx={hasEye ? 15 : 13} ry={hasEye ? 17 : 15} fill="white" stroke={color.membrane} strokeWidth="1.5" />
           <ellipse cx="119" cy="81" rx="8" ry="10" fill="#2D2D2D">
             <animate attributeName="cx" values="119;122;119;116;119" dur="4s" repeatCount="indefinite" />
           </ellipse>
           <circle cx="122" cy="77" r="3.5" fill="white" opacity="0.9" />
-          <circle cx="116" cy="85" r="1.5" fill="white" opacity="0.5" />
+          {hasEye && <circle cx="116" cy="85" r="1.5" fill={color.highlight} opacity="0.6" />}
         </g>
 
-        {/* Mouth - cute little cell mouth */}
+        {/* Mouth */}
         <path
           d={isAdventuring ? "M90,105 Q100,118 110,105" : "M92,105 Q100,113 108,105"}
           stroke={color.membrane}
@@ -289,11 +317,11 @@ export function RobotAvatar({
           strokeLinecap="round"
         />
 
-        {/* Cheek blush - rosy spots */}
-        <ellipse cx="68" cy="95" rx="7" ry="4" fill="#FF9999" opacity="0.35" />
-        <ellipse cx="132" cy="95" rx="7" ry="4" fill="#FF9999" opacity="0.35" />
+        {/* Cheek blush */}
+        <ellipse cx="68" cy="95" rx="7" ry="4" fill="#FF9999" opacity="0.3" />
+        <ellipse cx="132" cy="95" rx="7" ry="4" fill="#FF9999" opacity="0.3" />
 
-        {/* Tiny food vacuoles / internal dots when adventuring */}
+        {/* Digestion particles when adventuring */}
         {isAdventuring && (
           <g>
             <circle cx="90" cy="130" r="2.5" fill={color.highlight} opacity="0.5">
@@ -302,7 +330,6 @@ export function RobotAvatar({
             </circle>
             <circle cx="110" cy="125" r="2" fill={color.highlight} opacity="0.4">
               <animate attributeName="cy" values="125;105;85;125" dur="2.3s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.4;0.7;0.1;0.4" dur="2.3s" repeatCount="indefinite" />
             </circle>
           </g>
         )}
@@ -311,13 +338,13 @@ export function RobotAvatar({
       {/* Floating particles when adventuring */}
       {isAdventuring && (
         <>
-          <span className="absolute top-1 left-6 h-2 w-2 rounded-full bg-primary/40 animate-ping" style={{ animationDuration: "1.5s" }} />
-          <span className="absolute top-10 right-3 h-1.5 w-1.5 rounded-full bg-accent/50 animate-ping" style={{ animationDuration: "2s", animationDelay: "0.5s" }} />
-          <span className="absolute bottom-10 left-3 h-1.5 w-1.5 rounded-full bg-primary/30 animate-ping" style={{ animationDuration: "1.8s", animationDelay: "1s" }} />
+          <span className="absolute top-1 left-6 h-2 w-2 rounded-full animate-ping" style={{ background: color.glow, animationDuration: "1.5s" }} />
+          <span className="absolute top-10 right-3 h-1.5 w-1.5 rounded-full animate-ping" style={{ background: "#f0c040", animationDuration: "2s", animationDelay: "0.5s" }} />
+          <span className="absolute bottom-10 left-3 h-1.5 w-1.5 rounded-full animate-ping" style={{ background: color.glow, animationDuration: "1.8s", animationDelay: "1s" }} />
         </>
       )}
     </div>
   )
 }
 
-export { ROBOT_COLORS, HATS }
+export { CELL_COLORS as ROBOT_COLORS, APPENDAGES as HATS }

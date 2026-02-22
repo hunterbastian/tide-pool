@@ -1,188 +1,241 @@
-export interface RobotStats {
-  attack: number
-  defense: number
-  speed: number
-  luck: number
+// ── Cell Stats ────────────────────────────────────────────────
+export interface CellStats {
+  toxicity: number   // attack equivalent — venom / damage output
+  membrane: number   // defense equivalent — damage resistance
+  motility: number   // speed equivalent — faster adventures, dodge chance
+  adaptation: number // luck equivalent — crit chance, treasure find
 }
 
+// ── Upgrades (biological parts) ──────────────────────────────
 export interface Upgrade {
   id: string
   name: string
   description: string
   cost: number
-  stat: keyof RobotStats
+  currency: "nutrients" | "biomass"
+  stat: keyof CellStats
   boost: number
   icon: string
   tier: number
+  visualKey?: string // maps to a visual change on the cell SVG
 }
 
-export interface AdventureZone {
+// ── Adventure Biomes ─────────────────────────────────────────
+export interface Biome {
   id: string
   name: string
   description: string
   requiredLevel: number
-  baseDuration: number // in seconds
-  baseReward: { xp: number; coins: number }
+  baseDuration: number // seconds
+  baseReward: { xp: number; nutrients: number; biomass: number }
   dangerLevel: number
-  emoji: string
+  color: string
 }
 
+// ── Adventure Log ────────────────────────────────────────────
 export interface AdventureLog {
   id: string
-  zone: AdventureZone
-  result: "victory" | "defeat" | "treasure" | "event"
+  biome: Biome
+  result: "devour" | "flee" | "discovery" | "evolution"
   message: string
   xpGained: number
-  coinsGained: number
+  nutrientsGained: number
+  biomassGained: number
   timestamp: number
 }
 
+// ── Game State ───────────────────────────────────────────────
 export interface GameState {
-  robotName: string
+  cellName: string
   level: number
   xp: number
   xpToNext: number
-  coins: number
-  stats: RobotStats
-  upgrades: string[] // purchased upgrade IDs
+  nutrients: number       // primary currency (coins)
+  biomass: number         // premium currency from adventures
+  stats: CellStats
+  upgrades: string[]      // purchased upgrade IDs
   adventureLog: AdventureLog[]
   isAdventuring: boolean
   adventureEndTime: number | null
-  currentZone: AdventureZone | null
+  currentBiome: Biome | null
   totalAdventures: number
-  totalVictories: number
-  hatIndex: number
+  totalDevours: number
+  hatIndex: number        // appendage index
   colorIndex: number
+  nutrientsPerSec: number // idle income
+  lastTickTime: number    // timestamp for offline earnings
 }
 
+// ── Upgrades ─────────────────────────────────────────────────
 export const UPGRADES: Upgrade[] = [
-  { id: "blade-1", name: "Tiny Sword", description: "A cute little blade for your robot", cost: 10, stat: "attack", boost: 2, icon: "sword", tier: 1 },
-  { id: "blade-2", name: "Laser Sword", description: "Pew pew goes the blade!", cost: 50, stat: "attack", boost: 5, icon: "sword", tier: 2 },
-  { id: "blade-3", name: "Mega Cannon", description: "The ultimate firepower", cost: 200, stat: "attack", boost: 12, icon: "sword", tier: 3 },
-  { id: "shield-1", name: "Tin Shield", description: "A dented but lovable shield", cost: 10, stat: "defense", boost: 2, icon: "shield", tier: 1 },
-  { id: "shield-2", name: "Energy Barrier", description: "Deflects most attacks", cost: 50, stat: "defense", boost: 5, icon: "shield", tier: 2 },
-  { id: "shield-3", name: "Fortress Armor", description: "Nearly impenetrable!", cost: 200, stat: "defense", boost: 12, icon: "shield", tier: 3 },
-  { id: "boots-1", name: "Roller Wheels", description: "Zoom zoom!", cost: 10, stat: "speed", boost: 2, icon: "boots", tier: 1 },
-  { id: "boots-2", name: "Jet Boosters", description: "Now we're flying!", cost: 50, stat: "speed", boost: 5, icon: "boots", tier: 2 },
-  { id: "boots-3", name: "Warp Drive", description: "Faster than light!", cost: 200, stat: "speed", boost: 12, icon: "boots", tier: 3 },
-  { id: "charm-1", name: "Lucky Bolt", description: "A shiny lucky charm", cost: 15, stat: "luck", boost: 2, icon: "clover", tier: 1 },
-  { id: "charm-2", name: "Fortune Chip", description: "The odds favor you", cost: 60, stat: "luck", boost: 5, icon: "clover", tier: 2 },
-  { id: "charm-3", name: "Destiny Core", description: "Fate itself bends to your will", cost: 250, stat: "luck", boost: 12, icon: "clover", tier: 3 },
+  // Toxicity (attack)
+  { id: "tox-1", name: "Stinger Cell",     description: "Develops basic nematocysts",         cost: 10,  currency: "nutrients", stat: "toxicity",   boost: 2,  icon: "syringe",  tier: 1, visualKey: "stinger" },
+  { id: "tox-2", name: "Venom Sac",        description: "Secretes paralyzing enzymes",        cost: 50,  currency: "nutrients", stat: "toxicity",   boost: 5,  icon: "syringe",  tier: 2, visualKey: "venom" },
+  { id: "tox-3", name: "Acid Spray",       description: "Dissolves prey on contact",          cost: 200, currency: "biomass",   stat: "toxicity",   boost: 12, icon: "syringe",  tier: 3, visualKey: "acid" },
+  // Membrane (defense)
+  { id: "mem-1", name: "Lipid Layer",      description: "Thickens the cell wall",             cost: 10,  currency: "nutrients", stat: "membrane",   boost: 2,  icon: "shield",   tier: 1, visualKey: "lipid" },
+  { id: "mem-2", name: "Chitin Armor",     description: "Hard outer shell forms",             cost: 50,  currency: "nutrients", stat: "membrane",   boost: 5,  icon: "shield",   tier: 2, visualKey: "chitin" },
+  { id: "mem-3", name: "Spore Casing",     description: "Near-indestructible capsule",        cost: 200, currency: "biomass",   stat: "membrane",   boost: 12, icon: "shield",   tier: 3, visualKey: "spore" },
+  // Motility (speed)
+  { id: "mot-1", name: "Cilia Band",       description: "Tiny hairs propel you faster",       cost: 10,  currency: "nutrients", stat: "motility",   boost: 2,  icon: "wind",     tier: 1, visualKey: "cilia" },
+  { id: "mot-2", name: "Flagellum+",       description: "A powerful whip-tail",               cost: 50,  currency: "nutrients", stat: "motility",   boost: 5,  icon: "wind",     tier: 2, visualKey: "flagellum" },
+  { id: "mot-3", name: "Jet Propulsion",   description: "Expels water at high velocity",      cost: 200, currency: "biomass",   stat: "motility",   boost: 12, icon: "wind",     tier: 3, visualKey: "jet" },
+  // Adaptation (luck)
+  { id: "ada-1", name: "Photoreceptor",    description: "Primitive light sensing",            cost: 15,  currency: "nutrients", stat: "adaptation", boost: 2,  icon: "eye",      tier: 1, visualKey: "photo" },
+  { id: "ada-2", name: "Chemosensor",      description: "Detects nutrients from far away",    cost: 60,  currency: "nutrients", stat: "adaptation", boost: 5,  icon: "eye",      tier: 2, visualKey: "chemo" },
+  { id: "ada-3", name: "Neural Cluster",   description: "Proto-brain emerges!",               cost: 250, currency: "biomass",   stat: "adaptation", boost: 12, icon: "eye",      tier: 3, visualKey: "neural" },
 ]
 
-export const ADVENTURE_ZONES: AdventureZone[] = [
-  { id: "garden", name: "Robo Garden", description: "A peaceful garden full of friendly bugs and flowers", requiredLevel: 1, baseDuration: 8, baseReward: { xp: 15, coins: 8 }, dangerLevel: 1, emoji: "garden" },
-  { id: "junkyard", name: "Scrap Yard", description: "Piles of scrap metal and hidden treasures", requiredLevel: 3, baseDuration: 12, baseReward: { xp: 30, coins: 15 }, dangerLevel: 2, emoji: "junkyard" },
-  { id: "forest", name: "Pixel Forest", description: "A dense forest of digital trees and mushrooms", requiredLevel: 5, baseDuration: 15, baseReward: { xp: 50, coins: 25 }, dangerLevel: 3, emoji: "forest" },
-  { id: "cave", name: "Crystal Caves", description: "Glittering caverns full of surprises", requiredLevel: 8, baseDuration: 20, baseReward: { xp: 80, coins: 40 }, dangerLevel: 4, emoji: "cave" },
-  { id: "volcano", name: "Lava Mountain", description: "Only the bravest robots dare venture here!", requiredLevel: 12, baseDuration: 25, baseReward: { xp: 120, coins: 60 }, dangerLevel: 5, emoji: "volcano" },
-  { id: "space", name: "Outer Space", description: "The final frontier for robot adventurers!", requiredLevel: 16, baseDuration: 30, baseReward: { xp: 200, coins: 100 }, dangerLevel: 6, emoji: "space" },
+// ── Idle income upgrades (stacks with base) ──────────────────
+export const IDLE_UPGRADES: Upgrade[] = [
+  { id: "idle-1", name: "Chloroplast",     description: "Photosynthesis: +0.5 nutrients/sec", cost: 30,  currency: "nutrients", stat: "adaptation", boost: 0, icon: "leaf", tier: 1, visualKey: "chloro" },
+  { id: "idle-2", name: "Mitochondria+",   description: "Powerhouse: +1.5 nutrients/sec",     cost: 120, currency: "nutrients", stat: "adaptation", boost: 0, icon: "zap",  tier: 2, visualKey: "mito" },
+  { id: "idle-3", name: "Symbiote",        description: "Mutualism: +4 nutrients/sec",        cost: 400, currency: "biomass",   stat: "adaptation", boost: 0, icon: "heart",tier: 3, visualKey: "symbiote" },
 ]
 
+export const IDLE_RATES = [0.5, 1.5, 4] // nutrients per sec per idle upgrade tier
+
+// ── Biomes ───────────────────────────────────────────────────
+export const BIOMES: Biome[] = [
+  { id: "tidepool",    name: "Tide Pool",          description: "Warm, shallow water teeming with microbes",     requiredLevel: 1,  baseDuration: 8,  baseReward: { xp: 15, nutrients: 8,  biomass: 0 }, dangerLevel: 1, color: "#40c8e0" },
+  { id: "kelp",        name: "Kelp Forest",        description: "Dense algae forests hide predators and prey",   requiredLevel: 3,  baseDuration: 12, baseReward: { xp: 30, nutrients: 15, biomass: 1 }, dangerLevel: 2, color: "#40b060" },
+  { id: "coral",       name: "Coral Reef",         description: "Colorful and dangerous in equal measure",       requiredLevel: 5,  baseDuration: 15, baseReward: { xp: 50, nutrients: 25, biomass: 2 }, dangerLevel: 3, color: "#e07080" },
+  { id: "vent",        name: "Hydrothermal Vent",  description: "Superheated water and exotic chemotrophs",      requiredLevel: 8,  baseDuration: 20, baseReward: { xp: 80, nutrients: 40, biomass: 4 }, dangerLevel: 4, color: "#e06030" },
+  { id: "abyss",       name: "Abyssal Trench",     description: "Crushing pressure, bioluminescent horrors",     requiredLevel: 12, baseDuration: 25, baseReward: { xp: 120, nutrients: 60, biomass: 7 }, dangerLevel: 5, color: "#3040a0" },
+  { id: "primordial",  name: "Primordial Core",    description: "The origin of all life... and death",           requiredLevel: 16, baseDuration: 30, baseReward: { xp: 200, nutrients: 100, biomass: 12 }, dangerLevel: 6, color: "#a030c0" },
+]
+
+// ── Adventure Events ─────────────────────────────────────────
 const ADVENTURE_EVENTS = {
-  victory: [
-    "battled a wild glitch-bug and won!",
-    "defeated a rogue circuit board!",
-    "outsmarted a maze of laser beams!",
-    "vanquished a corrupted data monster!",
-    "bravely fought off a swarm of nano-bots!",
-    "crushed a challenging boss with style!",
+  devour: [
+    "engulfed a rival microbe in one gulp!",
+    "dissolved a bacterial colony with acid!",
+    "caught a fleeing paramecium!",
+    "ambushed prey hiding in the sediment!",
+    "overpowered a competing organism!",
+    "consumed a massive food particle!",
   ],
-  treasure: [
-    "found a hidden stash of golden bolts!",
-    "discovered a rare crystal chip!",
-    "stumbled upon an ancient tech cache!",
-    "unearthed a buried treasure chest!",
+  discovery: [
+    "found a cluster of amino acids!",
+    "discovered a mineral-rich deposit!",
+    "stumbled upon a nutrient geyser!",
+    "located an ancient organic compound!",
   ],
-  event: [
-    "made friends with a baby drone!",
-    "helped a lost robot find its way home!",
-    "discovered a mysterious glowing artifact!",
-    "learned a new dance from friendly locals!",
-    "found a beautiful vista and took a selfie!",
+  evolution: [
+    "felt a strange mutation taking hold...",
+    "absorbed foreign DNA and grew stronger!",
+    "witnessed a fellow organism evolve!",
+    "discovered a new survival strategy!",
+    "adapted to the extreme conditions!",
   ],
-  defeat: [
-    "got bonked by a falling gear...",
-    "slipped on an oil puddle...",
-    "ran into a wall and got dazed...",
-    "was outsmarted by a tricky puzzle...",
+  flee: [
+    "was chased off by a larger predator...",
+    "got caught in a toxic current...",
+    "bumped into a sea urchin...",
+    "was outmaneuvered by a faster organism...",
   ],
 }
 
+// ── Helpers ──────────────────────────────────────────────────
 export function calculateXpToNext(level: number): number {
   return Math.floor(50 * Math.pow(1.3, level - 1))
 }
 
-export function getTotalPower(stats: RobotStats): number {
-  return stats.attack + stats.defense + stats.speed + stats.luck
+export function getTotalPower(stats: CellStats): number {
+  return stats.toxicity + stats.membrane + stats.motility + stats.adaptation
 }
 
-export function resolveAdventure(state: GameState, zone: AdventureZone): AdventureLog {
-  const power = getTotalPower(state.stats)
-  const powerRatio = power / (zone.dangerLevel * 10)
-  const luckBonus = state.stats.luck * 0.02
+export function calculateNutrientsPerSec(upgrades: string[]): number {
+  let rate = 0.1 // base passive income
+  IDLE_UPGRADES.forEach((u, i) => {
+    if (upgrades.includes(u.id)) rate += IDLE_RATES[i]
+  })
+  return rate
+}
 
-  const roll = Math.random() + luckBonus
+export function calculateOfflineEarnings(state: GameState): { nutrients: number; elapsed: number } {
+  const now = Date.now()
+  const elapsed = Math.min((now - state.lastTickTime) / 1000, 3600 * 4) // cap 4h offline
+  const nutrients = Math.floor(state.nutrientsPerSec * elapsed)
+  return { nutrients, elapsed }
+}
+
+export function resolveAdventure(state: GameState, biome: Biome): AdventureLog {
+  const power = getTotalPower(state.stats)
+  const powerRatio = power / (biome.dangerLevel * 10)
+  const adaptBonus = state.stats.adaptation * 0.02
+
+  const roll = Math.random() + adaptBonus
   const successChance = Math.min(0.9, 0.3 + powerRatio * 0.15)
 
   let result: AdventureLog["result"]
   let xpMult = 1
-  let coinMult = 1
+  let nutrientMult = 1
+  let biomassMult = 1
 
   if (roll > 0.85) {
-    result = "treasure"
+    result = "discovery"
     xpMult = 1.5
-    coinMult = 2.5
+    nutrientMult = 2.5
+    biomassMult = 2
   } else if (roll > successChance * 0.3) {
-    if (Math.random() < 0.3) {
-      result = "event"
-      xpMult = 0.8
-      coinMult = 0.5
+    if (Math.random() < 0.25) {
+      result = "evolution"
+      xpMult = 1.2
+      nutrientMult = 0.5
+      biomassMult = 3
     } else {
-      result = "victory"
+      result = "devour"
       xpMult = 1
-      coinMult = 1
+      nutrientMult = 1
+      biomassMult = 1
     }
   } else {
-    result = "defeat"
+    result = "flee"
     xpMult = 0.3
-    coinMult = 0.1
+    nutrientMult = 0.1
+    biomassMult = 0
   }
 
   const events = ADVENTURE_EVENTS[result]
   const message = events[Math.floor(Math.random() * events.length)]
 
-  const speedBonus = 1 + state.stats.speed * 0.01
-  const xpGained = Math.floor(zone.baseReward.xp * xpMult * speedBonus)
-  const coinsGained = Math.floor(zone.baseReward.coins * coinMult)
+  const speedBonus = 1 + state.stats.motility * 0.01
+  const xpGained = Math.floor(biome.baseReward.xp * xpMult * speedBonus)
+  const nutrientsGained = Math.floor(biome.baseReward.nutrients * nutrientMult)
+  const biomassGained = Math.floor(biome.baseReward.biomass * biomassMult)
 
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    zone,
+    biome,
     result,
     message,
     xpGained,
-    coinsGained,
+    nutrientsGained,
+    biomassGained,
     timestamp: Date.now(),
   }
 }
 
 export function createInitialState(): GameState {
   return {
-    robotName: "Sparky",
+    cellName: "Blobby",
     level: 1,
     xp: 0,
     xpToNext: calculateXpToNext(1),
-    coins: 25,
-    stats: { attack: 3, defense: 3, speed: 3, luck: 2 },
+    nutrients: 25,
+    biomass: 0,
+    stats: { toxicity: 3, membrane: 3, motility: 3, adaptation: 2 },
     upgrades: [],
     adventureLog: [],
     isAdventuring: false,
     adventureEndTime: null,
-    currentZone: null,
+    currentBiome: null,
     totalAdventures: 0,
-    totalVictories: 0,
+    totalDevours: 0,
     hatIndex: 0,
     colorIndex: 0,
+    nutrientsPerSec: 0.1,
+    lastTickTime: Date.now(),
   }
 }

@@ -1,20 +1,16 @@
 "use client"
 
-import { UPGRADES, type GameState, type Upgrade } from "@/lib/game-state"
-import { cn } from "@/lib/utils"
-import { Shield, Sword, Zap, Clover, Lock, Check, Coins } from "lucide-react"
+import { UPGRADES, IDLE_UPGRADES, type GameState, type Upgrade } from "@/lib/game-state"
+import { Syringe, Shield, Wind, Eye, Leaf, Zap, Heart, Lock } from "lucide-react"
 
-const STAT_ICONS: Record<string, typeof Sword> = {
-  sword: Sword,
+const STAT_ICONS: Record<string, React.ElementType> = {
+  syringe: Syringe,
   shield: Shield,
-  boots: Zap,
-  clover: Clover,
-}
-
-const TIER_COLORS: Record<number, string> = {
-  1: "border-primary/30 bg-card",
-  2: "border-accent/50 bg-accent/5",
-  3: "border-chart-3/50 bg-chart-3/5",
+  wind: Wind,
+  eye: Eye,
+  leaf: Leaf,
+  zap: Zap,
+  heart: Heart,
 }
 
 interface UpgradeShopProps {
@@ -23,95 +19,85 @@ interface UpgradeShopProps {
 }
 
 export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
-  const groupedByStatAndTier = UPGRADES.reduce((acc, upgrade) => {
-    const key = upgrade.stat
-    if (!acc[key]) acc[key] = []
-    acc[key].push(upgrade)
-    return acc
-  }, {} as Record<string, Upgrade[]>)
+  const allUpgrades = [...UPGRADES, ...IDLE_UPGRADES]
+
+  const groups = [
+    { label: "Offense", ids: ["tox-1", "tox-2", "tox-3"], color: "#e04040" },
+    { label: "Defense", ids: ["mem-1", "mem-2", "mem-3"], color: "#40a0e0" },
+    { label: "Speed", ids: ["mot-1", "mot-2", "mot-3"], color: "#3ecf5c" },
+    { label: "Senses", ids: ["ada-1", "ada-2", "ada-3"], color: "#f0c040" },
+    { label: "Idle Income", ids: ["idle-1", "idle-2", "idle-3"], color: "#c060e0" },
+  ]
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-foreground">Upgrade Shop</h2>
-        <div className="flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1.5">
-          <Coins className="h-4 w-4 text-accent-foreground" />
-          <span className="font-mono text-sm font-bold text-accent-foreground">{state.coins}</span>
-        </div>
-      </div>
+    <div className="retro-panel">
+      <div className="retro-panel-header">Evolution Lab</div>
+      <div className="p-3 flex flex-col gap-3 max-h-[420px] overflow-y-auto">
+        {groups.map((group) => (
+          <div key={group.label}>
+            <div className="font-mono text-[11px] uppercase tracking-wider mb-1.5" style={{ color: group.color }}>
+              {group.label}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {group.ids.map((id) => {
+                const upgrade = allUpgrades.find((u) => u.id === id)!
+                const owned = state.upgrades.includes(id)
+                const tierIndex = parseInt(id.split("-")[1])
+                const prefix = id.split("-")[0]
+                const prevId = tierIndex > 1 ? `${prefix}-${tierIndex - 1}` : null
+                const locked = prevId ? !state.upgrades.includes(prevId) : false
+                const canAfford =
+                  upgrade.currency === "nutrients"
+                    ? state.nutrients >= upgrade.cost
+                    : state.biomass >= upgrade.cost
+                const Icon = STAT_ICONS[upgrade.icon] || Shield
 
-      {Object.entries(groupedByStatAndTier).map(([stat, upgrades]) => (
-        <div key={stat} className="flex flex-col gap-2">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {stat}
-          </h3>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            {upgrades.sort((a, b) => a.tier - b.tier).map((upgrade) => {
-              const Icon = STAT_ICONS[upgrade.icon] || Sword
-              const owned = state.upgrades.includes(upgrade.id)
-              const canAfford = state.coins >= upgrade.cost
-              const prevTierOwned = upgrade.tier === 1 || state.upgrades.some(
-                (id) => UPGRADES.find((u) => u.id === id)?.stat === upgrade.stat && 
-                        (UPGRADES.find((u) => u.id === id)?.tier ?? 0) === upgrade.tier - 1
-              )
-              const locked = !prevTierOwned && !owned
-
-              return (
-                <button
-                  key={upgrade.id}
-                  onClick={() => !owned && canAfford && !locked && onPurchase(upgrade)}
-                  disabled={owned || !canAfford || locked}
-                  className={cn(
-                    "flex flex-col gap-2 rounded-xl border-2 p-3 text-left transition-all",
-                    TIER_COLORS[upgrade.tier],
-                    owned && "border-primary/40 bg-primary/10 opacity-80",
-                    !owned && canAfford && !locked && "cursor-pointer hover:scale-[1.02] hover:shadow-md active:scale-[0.98]",
-                    !owned && !canAfford && !locked && "opacity-50",
-                    locked && "opacity-30"
-                  )}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-lg",
-                        owned ? "bg-primary/20" : "bg-secondary"
-                      )}>
-                        {locked ? (
-                          <Lock className="h-4 w-4 text-muted-foreground" />
-                        ) : owned ? (
-                          <Check className="h-4 w-4 text-primary" />
-                        ) : (
-                          <Icon className="h-4 w-4 text-foreground" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground leading-tight">{upgrade.name}</p>
-                        <p className="text-xs text-muted-foreground">{upgrade.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-primary">
-                      +{upgrade.boost} {upgrade.stat}
+                return (
+                  <button
+                    key={id}
+                    onClick={() => onPurchase(upgrade)}
+                    disabled={owned || locked || !canAfford}
+                    className={`flex items-center gap-2.5 px-2.5 py-2 rounded text-left transition-all text-sm ${
+                      owned
+                        ? "bg-[#1a3050] border border-[#2a4a6a] opacity-60 cursor-default"
+                        : locked
+                        ? "bg-[#0f1a2a] border border-[#1a2a3a] opacity-40 cursor-not-allowed"
+                        : canAfford
+                        ? "retro-btn"
+                        : "bg-[#1a2a40] border border-[#2a3a50] opacity-50 cursor-not-allowed"
+                    }`}
+                  >
+                    <span
+                      className="flex items-center justify-center w-7 h-7 rounded shrink-0"
+                      style={{ background: owned ? "#2a4a6a" : `${group.color}30` }}
+                    >
+                      {locked ? (
+                        <Lock className="w-3.5 h-3.5" style={{ color: "#5a7a9a" }} />
+                      ) : (
+                        <Icon className="w-3.5 h-3.5" style={{ color: owned ? "#5a7a9a" : group.color }} />
+                      )}
                     </span>
-                    {owned ? (
-                      <span className="text-xs font-bold text-primary">Owned</span>
-                    ) : (
-                      <span className={cn(
-                        "flex items-center gap-1 text-xs font-bold",
-                        canAfford ? "text-accent-foreground" : "text-muted-foreground"
-                      )}>
-                        <Coins className="h-3 w-3" />
-                        {upgrade.cost}
+                    <span className="flex-1 min-w-0">
+                      <span className="block font-bold text-xs leading-tight" style={{ color: owned ? "#5a7a9a" : "#d0e0ff" }}>
+                        {upgrade.name}
+                        {owned && <span className="ml-1 text-[10px]" style={{ color: "#3ecf5c" }}>[EVOLVED]</span>}
+                      </span>
+                      <span className="block text-[10px] leading-tight" style={{ color: "#6090c0" }}>
+                        {locked ? "Requires previous tier" : upgrade.description}
+                      </span>
+                    </span>
+                    {!owned && !locked && (
+                      <span className="font-mono text-xs font-bold whitespace-nowrap shrink-0" style={{ color: upgrade.currency === "biomass" ? "#c060e0" : "#f0c040" }}>
+                        {upgrade.cost} {upgrade.currency === "biomass" ? "BM" : "NUT"}
                       </span>
                     )}
-                  </div>
-                </button>
-              )
-            })}
+                  </button>
+                )
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }
