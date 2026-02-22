@@ -7,8 +7,8 @@ const _nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito" });
 const _spaceMono = Space_Mono({ weight: ["400", "700"], subsets: ["latin"], variable: "--font-space-mono" });
 
 export const metadata: Metadata = {
-  title: 'RoboPal - Upgrade & Adventure',
-  description: 'Build and upgrade your cute robot companion, send it on adventures to level up!',
+  title: 'Robot Adventure',
+  description: 'Upgrade your cute robot companion and send it on adventures to level up!',
   generator: 'v0.app',
   icons: {
     icon: [

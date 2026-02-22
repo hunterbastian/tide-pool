@@ -19,7 +19,7 @@ import { Wrench, Map, ScrollText, Bot } from "lucide-react"
 
 type Tab = "upgrades" | "adventure" | "log"
 
-export default function RoboPalGame() {
+export default function RobotAdventureGame() {
   const [state, setState] = useState<GameState>(createInitialState)
   const [activeTab, setActiveTab] = useState<Tab>("adventure")
   const [showLevelUp, setShowLevelUp] = useState(false)
@@ -126,7 +126,7 @@ export default function RoboPalGame() {
       <header className="sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3">
           <Bot className="h-6 w-6 text-primary" />
-          <h1 className="text-lg font-bold text-foreground">RoboPal</h1>
+          <h1 className="text-lg font-bold text-foreground">Robot Adventure</h1>
           <span className="ml-auto rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
             Lvl {state.level}
           </span>
