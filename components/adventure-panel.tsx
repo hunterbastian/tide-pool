@@ -1,15 +1,18 @@
 "use client"
 
-import { BIOMES, type GameState, type Biome, getTotalPower } from "@/lib/game-state"
+import { BIOMES, type GameState, type Biome, type ArenaEvent, getTotalPower } from "@/lib/game-state"
+import { ArenaView } from "@/components/arena-view"
 import { Lock, Timer } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface AdventurePanelProps {
   state: GameState
+  colorHex: string
   onAdventure: (biome: Biome) => void
+  onArenaEvent: (event: ArenaEvent) => void
 }
 
-export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
+export function AdventurePanel({ state, colorHex, onAdventure, onArenaEvent }: AdventurePanelProps) {
   const [timeLeft, setTimeLeft] = useState(0)
 
   useEffect(() => {
@@ -37,21 +40,31 @@ export function AdventurePanel({ state, onAdventure }: AdventurePanelProps) {
         )}
       </div>
 
-      {/* Active adventure banner */}
+      {/* Active arena */}
       {state.isAdventuring && state.currentBiome && (
-        <div className="mx-3 mt-3 border border-[#1e3028] px-3 py-2" style={{ background: "linear-gradient(180deg, #0e1a12 0%, #080f0a 100%)", borderRadius: "2px" }}>
-          <p className="text-center text-sm font-bold font-mono uppercase tracking-wider" style={{ color: "#44aa44", textShadow: "0 0 4px rgba(68,170,68,0.2)" }}>
-            Hunting in {state.currentBiome.name}...
-          </p>
-          <div className="mt-1 flex justify-center gap-1">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className="inline-block h-1.5 w-1.5 rounded-full animate-bounce"
-                style={{ background: "#44aa44", animationDelay: `${i * 0.2}s` }}
-              />
-            ))}
+        <div className="mx-3 mt-3 flex flex-col gap-2">
+          <div className="flex items-center justify-center gap-2 py-1">
+            <span className="font-mono text-sm font-bold uppercase tracking-wider" style={{ color: "#44aa44", textShadow: "0 0 4px rgba(68,170,68,0.2)" }}>
+              Hunting in {state.currentBiome.name}
+            </span>
           </div>
+          <ArenaView
+            biome={state.currentBiome}
+            stats={state.stats}
+            colorHex={colorHex}
+            isActive={state.isAdventuring}
+            onArenaEvent={onArenaEvent}
+          />
+          {/* Recent arena events */}
+          {state.arenaEvents.length > 0 && (
+            <div className="flex flex-col gap-0.5 max-h-20 overflow-y-auto px-1">
+              {state.arenaEvents.slice(-3).map((evt) => (
+                <p key={evt.id} className="text-xs font-mono leading-snug" style={{ color: evt.type === "lost_fight" ? "#aa3030" : "#4a6058" }}>
+                  {evt.message}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

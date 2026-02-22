@@ -1,7 +1,7 @@
 "use client"
 
-import { UPGRADES, IDLE_UPGRADES, type GameState, type Upgrade } from "@/lib/game-state"
-import { Syringe, Shield, Wind, Eye, Leaf, Zap, Heart, Lock } from "lucide-react"
+import { UPGRADES, IDLE_UPGRADES, type GameState, type Upgrade, getFragmentDiscount, FRAGMENT_NUTRIENT_VALUE, FRAGMENT_BIOMASS_VALUE } from "@/lib/game-state"
+import { Syringe, Shield, Wind, Eye, Leaf, Zap, Heart, Lock, Gem } from "lucide-react"
 
 const STAT_ICONS: Record<string, React.ElementType> = {
   syringe: Syringe,
@@ -16,9 +16,10 @@ const STAT_ICONS: Record<string, React.ElementType> = {
 interface UpgradeShopProps {
   state: GameState
   onPurchase: (upgrade: Upgrade) => void
+  onPurchaseWithFragments: (upgrade: Upgrade) => void
 }
 
-export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
+export function UpgradeShop({ state, onPurchase, onPurchaseWithFragments }: UpgradeShopProps) {
   const allUpgrades = [...UPGRADES, ...IDLE_UPGRADES]
 
   const groups = [
@@ -31,7 +32,15 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
 
   return (
     <div className="retro-panel">
-      <div className="retro-panel-header">Evolution Lab</div>
+      <div className="retro-panel-header flex items-center justify-between">
+        <span>Evolution Lab</span>
+        {state.mutationFragments > 0 && (
+          <span className="flex items-center gap-1 normal-case tracking-normal text-sm" style={{ color: "#c89030" }}>
+            <Gem className="h-3.5 w-3.5" />
+            {state.mutationFragments} fragments
+          </span>
+        )}
+      </div>
       <div className="p-3 flex flex-col gap-3 max-h-[420px] overflow-y-auto">
         {groups.map((group) => (
           <div key={group.label}>
@@ -87,11 +96,36 @@ export function UpgradeShop({ state, onPurchase }: UpgradeShopProps) {
                         {locked ? "Evolve previous tier first" : upgrade.description}
                       </span>
                     </span>
-                    {!owned && !locked && (
-                      <span className="font-mono text-sm font-bold whitespace-nowrap shrink-0" style={{ color: upgrade.currency === "biomass" ? "#884488" : "#c89030" }}>
-                        {upgrade.cost} {upgrade.currency === "biomass" ? "BM" : "NUT"}
-                      </span>
-                    )}
+                    {!owned && !locked && (() => {
+                      const { fragmentsUsed, discount } = getFragmentDiscount(upgrade, state.mutationFragments)
+                      const discountedCost = upgrade.cost - discount
+                      const canAffordWithFrags = upgrade.currency === "nutrients"
+                        ? state.nutrients >= discountedCost
+                        : state.biomass >= discountedCost
+                      return (
+                        <div className="flex flex-col items-end gap-0.5 shrink-0">
+                          <span className="font-mono text-sm font-bold whitespace-nowrap" style={{ color: upgrade.currency === "biomass" ? "#884488" : "#c89030" }}>
+                            {upgrade.cost} {upgrade.currency === "biomass" ? "BM" : "NUT"}
+                          </span>
+                          {fragmentsUsed > 0 && !canAfford && canAffordWithFrags && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); onPurchaseWithFragments(upgrade) }}
+                              className="font-mono text-xs whitespace-nowrap px-1.5 py-0.5"
+                              style={{
+                                background: "linear-gradient(180deg, #c89030, #a07020)",
+                                color: "#1a1000",
+                                border: "1px solid #604008",
+                                borderRadius: "2px",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                              }}
+                            >
+                              Use {fragmentsUsed} frags ({discountedCost} {upgrade.currency === "biomass" ? "BM" : "NUT"})
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })()}
                   </button>
                 )
               })}

@@ -5,6 +5,7 @@ import {
   type GameState,
   type Biome,
   type Upgrade,
+  type ArenaEvent,
   UPGRADES,
   IDLE_UPGRADES,
   createInitialState,
@@ -12,7 +13,11 @@ import {
   calculateXpToNext,
   calculateNutrientsPerSec,
   calculateOfflineEarnings,
+  getFragmentDiscount,
 } from "@/lib/game-state"
+
+// Matches CELL_COLORS in robot-avatar.tsx
+const CELL_COLOR_HEX = ["#3a7a68", "#8a4040", "#8a7a40", "#506080", "#5a8a4a"]
 import { RobotStatus } from "@/components/robot-status"
 import { UpgradeShop } from "@/components/upgrade-shop"
 import { AdventurePanel } from "@/components/adventure-panel"
@@ -47,6 +52,9 @@ export default function CellStageGame() {
         }
         parsed.lastTickTime = Date.now()
         parsed.nutrientsPerSec = calculateNutrientsPerSec(parsed.upgrades)
+        // Backward compat for saves without new fields
+        if (parsed.mutationFragments === undefined) parsed.mutationFragments = 0
+        if (parsed.arenaEvents === undefined) parsed.arenaEvents = []
         // Clear stale adventure
         if (parsed.isAdventuring && parsed.adventureEndTime && parsed.adventureEndTime < Date.now()) {
           parsed.isAdventuring = false
@@ -128,6 +136,7 @@ export default function CellStageGame() {
       const speedReduction = Math.max(0.4, 1 - state.stats.motility * 0.01)
       const duration = Math.ceil(biome.baseDuration * speedReduction * 1000)
 
+      setActiveTab("adventure") // Auto-switch to Explore tab to show arena
       setState((prev) => {
         if (!prev) return prev
         return {
@@ -135,6 +144,7 @@ export default function CellStageGame() {
           isAdventuring: true,
           adventureEndTime: Date.now() + duration,
           currentBiome: biome,
+          arenaEvents: [], // Clear previous arena events
         }
       })
 
@@ -147,6 +157,7 @@ export default function CellStageGame() {
             isAdventuring: false,
             adventureEndTime: null,
             currentBiome: null,
+            arenaEvents: [],
             xp: prev.xp + log.xpGained,
             nutrients: prev.nutrients + log.nutrientsGained,
             biomass: prev.biomass + log.biomassGained,
@@ -201,6 +212,47 @@ export default function CellStageGame() {
     setState((prev) => (prev ? { ...prev, hatIndex: index } : prev))
   }, [])
 
+  const handleArenaEvent = useCallback((event: ArenaEvent) => {
+    setState((prev) => {
+      if (!prev) return prev
+      let s = { ...prev, arenaEvents: [...prev.arenaEvents, event] }
+      // Apply immediate rewards
+      if (event.nutrients) s.nutrients += event.nutrients
+      if (event.biomass) s.biomass += event.biomass
+      if (event.fragments) s.mutationFragments += event.fragments
+      if (event.statBoost) {
+        s.stats = { ...s.stats, [event.statBoost.stat]: s.stats[event.statBoost.stat] + event.statBoost.amount }
+      }
+      return s
+    })
+  }, [])
+
+  const handlePurchaseWithFragments = useCallback((upgrade: Upgrade) => {
+    setState((prev) => {
+      if (!prev) return prev
+      if (prev.upgrades.includes(upgrade.id)) return prev
+      const { fragmentsUsed, discount } = getFragmentDiscount(upgrade, prev.mutationFragments)
+      const discountedCost = upgrade.cost - discount
+      const currency = upgrade.currency === "biomass" ? "biomass" : "nutrients"
+      if ((prev[currency] as number) < discountedCost) return prev
+
+      const isIdleUpgrade = IDLE_UPGRADES.some((u) => u.id === upgrade.id)
+      const newUpgrades = [...prev.upgrades, upgrade.id]
+      const newNutrientsPerSec = calculateNutrientsPerSec(newUpgrades)
+
+      return {
+        ...prev,
+        [currency]: (prev[currency] as number) - discountedCost,
+        mutationFragments: prev.mutationFragments - fragmentsUsed,
+        upgrades: newUpgrades,
+        stats: isIdleUpgrade
+          ? prev.stats
+          : { ...prev.stats, [upgrade.stat]: prev.stats[upgrade.stat] + upgrade.boost },
+        nutrientsPerSec: newNutrientsPerSec,
+      }
+    })
+  }, [])
+
   if (!state) return null
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
@@ -240,6 +292,11 @@ export default function CellStageGame() {
           <span className="font-mono text-sm" style={{ color: "#884488" }}>
             {state.biomass} BM
           </span>
+          {state.mutationFragments > 0 && (
+            <span className="font-mono text-sm" style={{ color: "#c89030" }}>
+              {state.mutationFragments} FRG
+            </span>
+          )}
         </div>
       </header>
 
@@ -306,10 +363,15 @@ export default function CellStageGame() {
 
             {/* Tab content */}
             {activeTab === "adventure" && (
-              <AdventurePanel state={state} onAdventure={handleAdventure} />
+              <AdventurePanel
+                state={state}
+                colorHex={CELL_COLOR_HEX[state.colorIndex % CELL_COLOR_HEX.length]}
+                onAdventure={handleAdventure}
+                onArenaEvent={handleArenaEvent}
+              />
             )}
             {activeTab === "upgrades" && (
-              <UpgradeShop state={state} onPurchase={handlePurchase} />
+              <UpgradeShop state={state} onPurchase={handlePurchase} onPurchaseWithFragments={handlePurchaseWithFragments} />
             )}
             {activeTab === "log" && (
               <AdventureLogView logs={state.adventureLog} />

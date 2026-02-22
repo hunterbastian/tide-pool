@@ -32,6 +32,90 @@ export interface Biome {
   color: string
 }
 
+// ── Arena Loot ───────────────────────────────────────────────
+export type ArenaEntityType = "food" | "enemy" | "loot"
+export type ArenaLootKind = "nutrient_glob" | "biomass_chunk" | "stat_shard" | "mutation_fragment" | "temp_buff"
+
+export interface ArenaEvent {
+  id: string
+  type: "ate_food" | "killed_enemy" | "lost_fight" | "collected_loot"
+  message: string
+  nutrients?: number
+  biomass?: number
+  statBoost?: { stat: keyof CellStats; amount: number }
+  fragments?: number
+  tempBuff?: { stat: keyof CellStats; amount: number }
+}
+
+export interface ArenaLootDrop {
+  kind: ArenaLootKind
+  weight: number
+  label: string
+}
+
+export const ARENA_LOOT_TABLE: ArenaLootDrop[] = [
+  { kind: "nutrient_glob",      weight: 40, label: "Nutrient Glob" },
+  { kind: "biomass_chunk",      weight: 15, label: "Biomass Chunk" },
+  { kind: "stat_shard",         weight: 20, label: "Stat Shard" },
+  { kind: "mutation_fragment",  weight: 15, label: "Mutation Fragment" },
+  { kind: "temp_buff",          weight: 10, label: "Adrenaline Burst" },
+]
+
+const STAT_KEYS: (keyof CellStats)[] = ["toxicity", "membrane", "motility", "adaptation"]
+
+export function rollArenaLoot(biome: Biome): { kind: ArenaLootKind; event: ArenaEvent } {
+  const totalWeight = ARENA_LOOT_TABLE.reduce((s, l) => s + l.weight, 0)
+  let roll = Math.random() * totalWeight
+  let picked = ARENA_LOOT_TABLE[0]
+  for (const entry of ARENA_LOOT_TABLE) {
+    roll -= entry.weight
+    if (roll <= 0) { picked = entry; break }
+  }
+
+  const stat = STAT_KEYS[Math.floor(Math.random() * STAT_KEYS.length)]
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+
+  switch (picked.kind) {
+    case "nutrient_glob": {
+      const amt = 3 + Math.floor(Math.random() * 6 * biome.dangerLevel)
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Absorbed a nutrient glob. +${amt} nutrients.`, nutrients: amt } }
+    }
+    case "biomass_chunk": {
+      const amt = 1 + Math.floor(Math.random() * biome.dangerLevel * 0.5)
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Ripped apart a biomass chunk. +${amt} biomass.`, biomass: amt } }
+    }
+    case "stat_shard": {
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `A shard of ${stat} fused into your membrane. +1 ${stat}.`, statBoost: { stat, amount: 1 } } }
+    }
+    case "mutation_fragment": {
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Found a writhing mutation fragment. It pulses with potential.`, fragments: 1 } }
+    }
+    case "temp_buff": {
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Adrenaline floods your system. +3 ${stat} for this run.`, tempBuff: { stat, amount: 3 } } }
+    }
+  }
+}
+
+export function rollArenaFight(stats: CellStats, biome: Biome): ArenaEvent {
+  const power = stats.toxicity + stats.membrane
+  const enemyPower = biome.dangerLevel * 5 + Math.random() * 5
+  const won = power + Math.random() * 10 > enemyPower
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+
+  if (won) {
+    const nut = 2 + Math.floor(Math.random() * 4 * biome.dangerLevel)
+    return { id, type: "killed_enemy", message: `Tore an enemy apart. Absorbed its remains. +${nut} nutrients.`, nutrients: nut }
+  } else {
+    return { id, type: "lost_fight", message: `Something bit back. You took damage and fled.` }
+  }
+}
+
+export function rollArenaFood(biome: Biome): ArenaEvent {
+  const nut = 1 + Math.floor(Math.random() * 3 * biome.dangerLevel)
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+  return { id, type: "ate_food", message: `Consumed organic matter drifting in the murk. +${nut} nutrients.`, nutrients: nut }
+}
+
 // ── Adventure Log ────────────────────────────────────────────
 export interface AdventureLog {
   id: string
@@ -52,9 +136,11 @@ export interface GameState {
   xpToNext: number
   nutrients: number       // primary currency (coins)
   biomass: number         // premium currency from adventures
+  mutationFragments: number // arena loot currency — discounts upgrades
   stats: CellStats
   upgrades: string[]      // purchased upgrade IDs
   adventureLog: AdventureLog[]
+  arenaEvents: ArenaEvent[]  // real-time events during current arena run
   isAdventuring: boolean
   adventureEndTime: number | null
   currentBiome: Biome | null
@@ -153,6 +239,18 @@ export function calculateNutrientsPerSec(upgrades: string[]): number {
   return rate
 }
 
+// Fragment discount: 1 fragment = 10 nutrient discount or 3 biomass discount
+export const FRAGMENT_NUTRIENT_VALUE = 10
+export const FRAGMENT_BIOMASS_VALUE = 3
+
+export function getFragmentDiscount(upgrade: Upgrade, fragments: number): { fragmentsUsed: number; discount: number } {
+  const valuePerFragment = upgrade.currency === "biomass" ? FRAGMENT_BIOMASS_VALUE : FRAGMENT_NUTRIENT_VALUE
+  const maxUseful = Math.ceil(upgrade.cost / valuePerFragment)
+  const fragmentsUsed = Math.min(fragments, maxUseful)
+  const discount = Math.min(upgrade.cost, fragmentsUsed * valuePerFragment)
+  return { fragmentsUsed, discount }
+}
+
 export function calculateOfflineEarnings(state: GameState): { nutrients: number; elapsed: number } {
   const now = Date.now()
   const elapsed = Math.min((now - state.lastTickTime) / 1000, 3600 * 4) // cap 4h offline
@@ -225,9 +323,11 @@ export function createInitialState(): GameState {
     xpToNext: calculateXpToNext(1),
     nutrients: 25,
     biomass: 0,
+    mutationFragments: 0,
     stats: { toxicity: 3, membrane: 3, motility: 3, adaptation: 2 },
     upgrades: [],
     adventureLog: [],
+    arenaEvents: [],
     isAdventuring: false,
     adventureEndTime: null,
     currentBiome: null,
