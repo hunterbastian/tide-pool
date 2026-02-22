@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
-import { Nunito, Space_Mono } from 'next/font/google'
+import { Nunito, VT323 } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const _nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito" });
-const _spaceMono = Space_Mono({ weight: ["400", "700"], subsets: ["latin"], variable: "--font-space-mono" });
+const _vt323 = VT323({ weight: "400", subsets: ["latin"], variable: "--font-vt323" });
 
 export const metadata: Metadata = {
-  title: 'Robot Adventure',
-  description: 'Upgrade your cute robot companion and send it on adventures to level up!',
+  title: 'Cell Stage - Evolve or Perish',
+  description: 'Evolve your cell organism, collect nutrients, and conquer the primordial soup!',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${_nunito.variable} ${_spaceMono.variable}`}>
+    <html lang="en" className={`${_nunito.variable} ${_vt323.variable}`}>
       <body className="font-sans antialiased">
         {children}
         <Analytics />
