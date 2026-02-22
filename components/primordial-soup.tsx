@@ -35,10 +35,10 @@ export function PrimordialSoup() {
     window.addEventListener("resize", resize)
 
     const colors = {
-      debris: ["#1a2a18", "#2a3820", "#1a3018", "#223020"],
-      bubble: ["#0a1a14", "#102018", "#0a1810"],
-      predator: ["#3a1818", "#4a2020", "#301010"],
-      spore: ["#2a2818", "#383020", "#2a2010"],
+      debris: ["#1a3028", "#2a4030", "#1e3828", "#284030"],
+      bubble: ["#102820", "#183028", "#122820"],
+      predator: ["#302830", "#3a3038", "#282430"],
+      spore: ["#2a3020", "#303828", "#283020"],
     }
 
     const particles: Particle[] = []
@@ -128,7 +128,7 @@ export function PrimordialSoup() {
           // Dim red eye
           ctx.beginPath()
           ctx.arc(p.x + p.size * 0.2, p.y - p.size * 0.1, 1, 0, Math.PI * 2)
-          ctx.fillStyle = "#601010"
+          ctx.fillStyle = "#503040"
           ctx.globalAlpha = 0.3 + 0.2 * Math.sin(time * 0.03)
           ctx.fill()
         }

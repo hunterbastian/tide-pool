@@ -78,20 +78,20 @@ export function rollArenaLoot(biome: Biome): { kind: ArenaLootKind; event: Arena
   switch (picked.kind) {
     case "nutrient_glob": {
       const amt = 3 + Math.floor(Math.random() * 6 * biome.dangerLevel)
-      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Absorbed a nutrient glob. +${amt} nutrients.`, nutrients: amt } }
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Scooped up a nutrient glob! +${amt} nutrients.`, nutrients: amt } }
     }
     case "biomass_chunk": {
       const amt = 1 + Math.floor(Math.random() * biome.dangerLevel * 0.5)
-      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Ripped apart a biomass chunk. +${amt} biomass.`, biomass: amt } }
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Found a chunky biomass deposit! +${amt} biomass.`, biomass: amt } }
     }
     case "stat_shard": {
-      return { kind: picked.kind, event: { id, type: "collected_loot", message: `A shard of ${stat} fused into your membrane. +1 ${stat}.`, statBoost: { stat, amount: 1 } } }
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `A glowing shard merged with you. +1 ${stat}!`, statBoost: { stat, amount: 1 } } }
     }
     case "mutation_fragment": {
-      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Found a writhing mutation fragment. It pulses with potential.`, fragments: 1 } }
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Found a shimmering mutation fragment! Full of potential.`, fragments: 1 } }
     }
     case "temp_buff": {
-      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Adrenaline floods your system. +3 ${stat} for this run.`, tempBuff: { stat, amount: 3 } } }
+      return { kind: picked.kind, event: { id, type: "collected_loot", message: `Energy surge! +3 ${stat} for this run.`, tempBuff: { stat, amount: 3 } } }
     }
   }
 }
@@ -104,16 +104,16 @@ export function rollArenaFight(stats: CellStats, biome: Biome): ArenaEvent {
 
   if (won) {
     const nut = 2 + Math.floor(Math.random() * 4 * biome.dangerLevel)
-    return { id, type: "killed_enemy", message: `Tore an enemy apart. Absorbed its remains. +${nut} nutrients.`, nutrients: nut }
+    return { id, type: "killed_enemy", message: `Won a scuffle! The rival swam away. +${nut} nutrients.`, nutrients: nut }
   } else {
-    return { id, type: "lost_fight", message: `Something bit back. You took damage and fled.` }
+    return { id, type: "lost_fight", message: `Bumped into something tough. Better retreat!` }
   }
 }
 
 export function rollArenaFood(biome: Biome): ArenaEvent {
   const nut = 1 + Math.floor(Math.random() * 3 * biome.dangerLevel)
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
-  return { id, type: "ate_food", message: `Consumed organic matter drifting in the murk. +${nut} nutrients.`, nutrients: nut }
+  return { id, type: "ate_food", message: `Nibbled on some drifting organic bits. +${nut} nutrients.`, nutrients: nut }
 }
 
 // ── Adventure Log ────────────────────────────────────────────
@@ -155,70 +155,70 @@ export interface GameState {
 // ── Upgrades ─────────────────────────────────────────────────
 export const UPGRADES: Upgrade[] = [
   // Toxicity (attack)
-  { id: "tox-1", name: "Barbed Stinger",   description: "Crude nematocysts that rip through tissue",  cost: 10,  currency: "nutrients", stat: "toxicity",   boost: 2,  icon: "syringe",  tier: 1, visualKey: "stinger" },
-  { id: "tox-2", name: "Venom Gland",      description: "Secretes a paralytic that dissolves nerves", cost: 50,  currency: "nutrients", stat: "toxicity",   boost: 5,  icon: "syringe",  tier: 2, visualKey: "venom" },
-  { id: "tox-3", name: "Corrosive Bile",   description: "Melts prey into soup on contact",            cost: 200, currency: "biomass",   stat: "toxicity",   boost: 12, icon: "syringe",  tier: 3, visualKey: "acid" },
+  { id: "tox-1", name: "Tiny Stinger",     description: "A small barb that packs a surprising punch",  cost: 10,  currency: "nutrients", stat: "toxicity",   boost: 2,  icon: "syringe",  tier: 1, visualKey: "stinger" },
+  { id: "tox-2", name: "Venom Sac",        description: "Produces a mild toxin that stuns rivals",     cost: 50,  currency: "nutrients", stat: "toxicity",   boost: 5,  icon: "syringe",  tier: 2, visualKey: "venom" },
+  { id: "tox-3", name: "Acid Spray",       description: "A potent chemical defense. Very persuasive",  cost: 200, currency: "biomass",   stat: "toxicity",   boost: 12, icon: "syringe",  tier: 3, visualKey: "acid" },
   // Membrane (defense)
-  { id: "mem-1", name: "Scar Tissue",      description: "Thickened membrane, harder to puncture",     cost: 10,  currency: "nutrients", stat: "membrane",   boost: 2,  icon: "shield",   tier: 1, visualKey: "lipid" },
-  { id: "mem-2", name: "Chitin Plating",   description: "Calcified shell plates fused to your body",  cost: 50,  currency: "nutrients", stat: "membrane",   boost: 5,  icon: "shield",   tier: 2, visualKey: "chitin" },
-  { id: "mem-3", name: "Bone Casing",      description: "Nearly indestructible ossified hull",         cost: 200, currency: "biomass",   stat: "membrane",   boost: 12, icon: "shield",   tier: 3, visualKey: "spore" },
+  { id: "mem-1", name: "Thick Skin",       description: "A sturdier outer layer for bumpy encounters", cost: 10,  currency: "nutrients", stat: "membrane",   boost: 2,  icon: "shield",   tier: 1, visualKey: "lipid" },
+  { id: "mem-2", name: "Chitin Shell",     description: "Hard plates that make you extra crunchy",     cost: 50,  currency: "nutrients", stat: "membrane",   boost: 5,  icon: "shield",   tier: 2, visualKey: "chitin" },
+  { id: "mem-3", name: "Spore Casing",     description: "An incredibly tough outer hull. Tank mode!",  cost: 200, currency: "biomass",   stat: "membrane",   boost: 12, icon: "shield",   tier: 3, visualKey: "spore" },
   // Motility (speed)
-  { id: "mot-1", name: "Cilia Fringe",     description: "Writhing hairs that claw through the murk",  cost: 10,  currency: "nutrients", stat: "motility",   boost: 2,  icon: "wind",     tier: 1, visualKey: "cilia" },
-  { id: "mot-2", name: "Lash Flagellum",   description: "A whip-tail that propels you violently",     cost: 50,  currency: "nutrients", stat: "motility",   boost: 5,  icon: "wind",     tier: 2, visualKey: "flagellum" },
-  { id: "mot-3", name: "Jet Siphon",       description: "Expels pressurized fluid for burst speed",   cost: 200, currency: "biomass",   stat: "motility",   boost: 12, icon: "wind",     tier: 3, visualKey: "jet" },
+  { id: "mot-1", name: "Cilia Fringe",     description: "Tiny hairs that help you zip through water",  cost: 10,  currency: "nutrients", stat: "motility",   boost: 2,  icon: "wind",     tier: 1, visualKey: "cilia" },
+  { id: "mot-2", name: "Flagellum",        description: "A whip-like tail for speedy propulsion",      cost: 50,  currency: "nutrients", stat: "motility",   boost: 5,  icon: "wind",     tier: 2, visualKey: "flagellum" },
+  { id: "mot-3", name: "Jet Siphon",       description: "Squirts water for quick bursts of speed",     cost: 200, currency: "biomass",   stat: "motility",   boost: 12, icon: "wind",     tier: 3, visualKey: "jet" },
   // Adaptation (luck)
-  { id: "ada-1", name: "Pit Organ",        description: "Crude heat-sensing pits along the membrane", cost: 15,  currency: "nutrients", stat: "adaptation", boost: 2,  icon: "eye",      tier: 1, visualKey: "photo" },
-  { id: "ada-2", name: "Chemoreceptor",    description: "Tastes blood in the water from afar",        cost: 60,  currency: "nutrients", stat: "adaptation", boost: 5,  icon: "eye",      tier: 2, visualKey: "chemo" },
-  { id: "ada-3", name: "Nerve Knot",       description: "A proto-brain writhes into existence",       cost: 250, currency: "biomass",   stat: "adaptation", boost: 12, icon: "eye",      tier: 3, visualKey: "neural" },
+  { id: "ada-1", name: "Sense Organ",      description: "Basic heat-sensing spots along your body",    cost: 15,  currency: "nutrients", stat: "adaptation", boost: 2,  icon: "eye",      tier: 1, visualKey: "photo" },
+  { id: "ada-2", name: "Chemoreceptor",    description: "Sniffs out tasty morsels from a distance",    cost: 60,  currency: "nutrients", stat: "adaptation", boost: 5,  icon: "eye",      tier: 2, visualKey: "chemo" },
+  { id: "ada-3", name: "Proto-Brain",      description: "A tiny cluster of neurons. You feel smarter", cost: 250, currency: "biomass",   stat: "adaptation", boost: 12, icon: "eye",      tier: 3, visualKey: "neural" },
 ]
 
 // ── Idle income upgrades (stacks with base) ──────────────────
 export const IDLE_UPGRADES: Upgrade[] = [
-  { id: "idle-1", name: "Stolen Chloroplast",  description: "Ripped from a dead alga. Leaks energy: +0.5/s",   cost: 30,  currency: "nutrients", stat: "adaptation", boost: 0, icon: "leaf", tier: 1, visualKey: "chloro" },
-  { id: "idle-2", name: "Bloated Mito",       description: "Overgrown powerhouse. Burns hot: +1.5/s",       cost: 120, currency: "nutrients", stat: "adaptation", boost: 0, icon: "zap",  tier: 2, visualKey: "mito" },
-  { id: "idle-3", name: "Parasite Bond",      description: "A creature fused to you. Feeds you both: +4/s", cost: 400, currency: "biomass",   stat: "adaptation", boost: 0, icon: "heart",tier: 3, visualKey: "symbiote" },
+  { id: "idle-1", name: "Borrowed Chloroplast", description: "A little green friend that makes energy: +0.5/s",  cost: 30,  currency: "nutrients", stat: "adaptation", boost: 0, icon: "leaf", tier: 1, visualKey: "chloro" },
+  { id: "idle-2", name: "Super Mitochondria",  description: "The powerhouse upgrade. Extra juice: +1.5/s",     cost: 120, currency: "nutrients", stat: "adaptation", boost: 0, icon: "zap",  tier: 2, visualKey: "mito" },
+  { id: "idle-3", name: "Symbiote Buddy",      description: "A friendly creature that shares nutrients: +4/s", cost: 400, currency: "biomass",   stat: "adaptation", boost: 0, icon: "heart",tier: 3, visualKey: "symbiote" },
 ]
 
 export const IDLE_RATES = [0.5, 1.5, 4] // nutrients per sec per idle upgrade tier
 
 // ── Biomes ───────────────────────────────────────────────────
 export const BIOMES: Biome[] = [
-  { id: "tidepool",    name: "Stagnant Pool",      description: "Warm, fetid water. Easy prey rots in the shallows",    requiredLevel: 1,  baseDuration: 8,  baseReward: { xp: 15, nutrients: 8,  biomass: 0 }, dangerLevel: 1, color: "#3a8868" },
-  { id: "kelp",        name: "Rotting Kelp Bed",   description: "Decomposing algae forests. Predators lurk within",  requiredLevel: 3,  baseDuration: 12, baseReward: { xp: 30, nutrients: 15, biomass: 1 }, dangerLevel: 2, color: "#4a7040" },
-  { id: "coral",       name: "Bone Reef",          description: "Calcified remains of dead colonies. Toxic and sharp",  requiredLevel: 5,  baseDuration: 15, baseReward: { xp: 50, nutrients: 25, biomass: 2 }, dangerLevel: 3, color: "#8a5050" },
-  { id: "vent",        name: "Sulfur Vent",        description: "Scalding, poisonous water. Only the adapted survive", requiredLevel: 8,  baseDuration: 20, baseReward: { xp: 80, nutrients: 40, biomass: 4 }, dangerLevel: 4, color: "#a06820" },
-  { id: "abyss",       name: "Crush Depth",        description: "Lightless void. Pressure warps flesh. Things hunt here", requiredLevel: 12, baseDuration: 25, baseReward: { xp: 120, nutrients: 60, biomass: 7 }, dangerLevel: 5, color: "#2a3060" },
-  { id: "primordial",  name: "The Maw",            description: "Where it all began. Where most things end",            requiredLevel: 16, baseDuration: 30, baseReward: { xp: 200, nutrients: 100, biomass: 12 }, dangerLevel: 6, color: "#602040" },
+  { id: "tidepool",    name: "Tide Pool",           description: "Warm, shallow water. Plenty of snacks floating around",     requiredLevel: 1,  baseDuration: 8,  baseReward: { xp: 15, nutrients: 8,  biomass: 0 }, dangerLevel: 1, color: "#4a9880" },
+  { id: "kelp",        name: "Kelp Forest",         description: "Towering algae groves full of hidden treasures",            requiredLevel: 3,  baseDuration: 12, baseReward: { xp: 30, nutrients: 15, biomass: 1 }, dangerLevel: 2, color: "#5a8850" },
+  { id: "coral",       name: "Coral Garden",        description: "Colorful reef structures. Watch out for territorial types", requiredLevel: 5,  baseDuration: 15, baseReward: { xp: 50, nutrients: 25, biomass: 2 }, dangerLevel: 3, color: "#c07068" },
+  { id: "vent",        name: "Thermal Vent",        description: "Warm mineral-rich waters. Tricky but rewarding",            requiredLevel: 8,  baseDuration: 20, baseReward: { xp: 80, nutrients: 40, biomass: 4 }, dangerLevel: 4, color: "#c08838" },
+  { id: "abyss",       name: "Deep Waters",         description: "Dark and mysterious. Big creatures roam down here",         requiredLevel: 12, baseDuration: 25, baseReward: { xp: 120, nutrients: 60, biomass: 7 }, dangerLevel: 5, color: "#4060a0" },
+  { id: "primordial",  name: "The Origin",          description: "The ancient depths where life first sparked",               requiredLevel: 16, baseDuration: 30, baseReward: { xp: 200, nutrients: 100, biomass: 12 }, dangerLevel: 6, color: "#8850a0" },
 ]
 
 // ── Adventure Events ─────────────────────────────────────────
 const ADVENTURE_EVENTS = {
   devour: [
-    "tore a rival apart membrane-first.",
-    "dissolved a bacterial colony. Nothing remained.",
-    "cornered a fleeing paramecium. It didn't escape.",
-    "ambushed something hiding in the sediment. It screamed chemically.",
-    "crushed a competitor. Absorbed its nutrients while it was still alive.",
-    "swallowed a massive food particle whole. Your body distended.",
+    "caught a smaller cell and gobbled it up. Tasty!",
+    "found a cluster of bacteria and had a feast.",
+    "chased down a slow-moving morsel. Nom nom!",
+    "surprised something hiding in the sediment. Snack time!",
+    "outswam a rival to the last food particle. Victory!",
+    "swallowed a big food glob whole. So full!",
   ],
   discovery: [
-    "found a rotting cluster of amino acids. Still useful.",
-    "discovered a mineral-rich deposit leaking from cracked rock.",
-    "stumbled into a nutrient geyser. Gorged until bloated.",
-    "located ancient organic compounds sealed in dead tissue.",
+    "found a cluster of amino acids drifting nearby. Score!",
+    "discovered a mineral-rich spring bubbling from below.",
+    "stumbled into a nutrient cloud. Ate until stuffed.",
+    "located some ancient organic compounds. Interesting flavor.",
   ],
   evolution: [
-    "something shifted inside you. A mutation took root...",
-    "absorbed foreign DNA from a corpse. You feel... different.",
-    "watched a fellow organism split and change. You understood.",
-    "survived something that should have killed you. You adapted.",
-    "the environment broke you. You rebuilt yourself stronger.",
+    "something shifted inside you. A new trait is emerging...",
+    "absorbed some unusual DNA. You feel... different.",
+    "watched another organism evolve. Inspiring!",
+    "survived a tough encounter and grew stronger.",
+    "the pressure down here changed you. In a good way.",
   ],
   flee: [
-    "something massive moved in the dark. You fled.",
-    "caught in a toxic plume. Membrane blistering. Retreated.",
-    "a predator's tendrils grazed you. You barely escaped.",
-    "outmaneuvered by something faster. It let you go. This time.",
+    "something big swam by. Time to hide!",
+    "drifted into an uncomfortable current. Retreated quickly.",
+    "a bigger cell got a bit too close. You scooted away.",
+    "outpaced by something faster. Better luck next time!",
   ],
 }
 

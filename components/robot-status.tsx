@@ -31,12 +31,12 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
         <div
           className="absolute -top-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full border-2"
           style={{
-            background: "linear-gradient(180deg, #2a6a2a, #1a4a1a)",
-            borderColor: "#0e2a0e",
-            boxShadow: "0 0 6px rgba(68,170,68,0.2)",
+            background: "linear-gradient(180deg, #3a8a4a, #2a7038)",
+            borderColor: "#1a5028",
+            boxShadow: "0 0 8px rgba(80,187,96,0.15)",
           }}
         >
-          <span className="font-mono text-sm font-bold" style={{ color: "#c0e0c0", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
+          <span className="font-mono text-sm font-bold" style={{ color: "#d0f0d0" }}>
             {state.level}
           </span>
         </div>
@@ -47,8 +47,8 @@ export function RobotStatus({ state, onChangeName, onChangeColor, onChangeHat }:
         type="text"
         value={state.cellName}
         onChange={(e) => onChangeName(e.target.value)}
-        className="w-36 border-b-2 border-dashed bg-transparent text-center text-lg font-bold outline-none transition-colors focus:border-[#44aa44]"
-        style={{ color: "#99a8a2", borderColor: "#1e3028" }}
+        className="w-36 border-b-2 border-dashed bg-transparent text-center text-lg font-bold outline-none transition-colors focus:border-[#50bb60]"
+        style={{ color: "#a8b8b2", borderColor: "#284038" }}
         maxLength={16}
         aria-label="Cell name"
       />

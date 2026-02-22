@@ -262,38 +262,38 @@ export default function CellStageGame() {
   ]
 
   return (
-    <main className="retro-scanlines retro-vignette relative min-h-screen overflow-hidden" style={{ background: "#060d10" }}>
+    <main className="relative min-h-screen overflow-hidden" style={{ background: "#0c1820" }}>
       <PrimordialSoup />
 
       {/* Header bar */}
       <header
         className="sticky top-0 z-40"
         style={{
-          background: "linear-gradient(180deg, #0e1a1e 0%, #080f12 100%)",
-          borderBottom: "2px solid #1e3028",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.8)",
+          background: "linear-gradient(180deg, #12242e 0%, #0e1c24 100%)",
+          borderBottom: "1px solid #284038",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
         }}
       >
         <div className="mx-auto flex max-w-5xl items-center gap-2.5 px-4 py-2">
-          <FlaskConical className="h-5 w-5" style={{ color: "#44aa44" }} />
+          <FlaskConical className="h-5 w-5" style={{ color: "#50bb60" }} />
           <h1
             className="font-mono text-base font-bold uppercase tracking-widest"
-            style={{ color: "#c89030", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}
+            style={{ color: "#d4a050" }}
           >
             Cell Stage
           </h1>
-          <span className="ml-auto font-mono text-sm" style={{ color: "#4a6058" }}>
+          <span className="ml-auto font-mono text-sm" style={{ color: "#608878" }}>
             LVL {state.level}
           </span>
-          <div className="w-px h-4" style={{ background: "#1e3028" }} />
-          <span className="font-mono text-sm" style={{ color: "#c89030" }}>
+          <div className="w-px h-4" style={{ background: "#284038" }} />
+          <span className="font-mono text-sm" style={{ color: "#d4a050" }}>
             {Math.floor(state.nutrients)} NUT
           </span>
-          <span className="font-mono text-sm" style={{ color: "#884488" }}>
+          <span className="font-mono text-sm" style={{ color: "#9868a8" }}>
             {state.biomass} BM
           </span>
           {state.mutationFragments > 0 && (
-            <span className="font-mono text-sm" style={{ color: "#c89030" }}>
+            <span className="font-mono text-sm" style={{ color: "#d4a050" }}>
               {state.mutationFragments} FRG
             </span>
           )}
@@ -305,9 +305,9 @@ export default function CellStageGame() {
         <div
           className="relative z-30 text-center py-2 text-sm font-mono font-bold cursor-pointer"
           style={{
-            background: "linear-gradient(90deg, #0e1a12, #081210, #0e1a12)",
-            color: "#44aa44",
-            borderBottom: "1px solid #1a3020",
+            background: "linear-gradient(90deg, #142a20, #102418, #142a20)",
+            color: "#50bb60",
+            borderBottom: "1px solid #284038",
           }}
           onClick={() => setOfflineMessage(null)}
         >
@@ -334,7 +334,7 @@ export default function CellStageGame() {
             {/* Tab bar */}
             <div
               className="flex gap-0.5 p-0.5"
-              style={{ background: "#040808", border: "2px solid #1a2820", borderRadius: "2px" }}
+              style={{ background: "#0a1618", border: "1px solid #284038", borderRadius: "8px" }}
             >
               {tabs.map((tab) => {
                 const Icon = tab.icon
@@ -346,12 +346,11 @@ export default function CellStageGame() {
                     className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-bold uppercase tracking-widest transition-all"
                     style={{
                       background: active
-                        ? "linear-gradient(180deg, #142420, #0e1a1e)"
+                        ? "linear-gradient(180deg, #1a3038, #142830)"
                         : "transparent",
-                      color: active ? "#c89030" : "#2a3a32",
-                      textShadow: active ? "0 1px 3px rgba(0,0,0,0.8)" : "none",
-                      borderBottom: active ? "1px solid #1e3028" : "1px solid transparent",
-                      borderRadius: "2px",
+                      color: active ? "#d4a050" : "#304840",
+                      borderBottom: active ? "1px solid #284038" : "1px solid transparent",
+                      borderRadius: "6px",
                     }}
                   >
                     <Icon className="h-4 w-4" />

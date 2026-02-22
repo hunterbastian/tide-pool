@@ -97,9 +97,9 @@ export function ArenaView({ biome, stats, colorHex, isActive, onArenaEvent }: Ar
     else { x = -15; y = Math.random() * ARENA_H }
 
     const colors = {
-      food: "#4a8a3a",
-      enemy: "#8a3030",
-      loot: "#c89030",
+      food: "#60b860",
+      enemy: "#cc6060",
+      loot: "#d4a050",
     }
 
     s.entities.push({
@@ -230,19 +230,19 @@ export function ArenaView({ biome, stats, colorHex, isActive, onArenaEvent }: Ar
 
           if (e.type === "food") {
             const event = rollArenaFood(biomeRef.current)
-            spawnParticles(e.pos, "#4a8a3a", 6)
-            spawnText(e.pos, `+${event.nutrients ?? 0}`, "#44aa44")
+            spawnParticles(e.pos, "#60b860", 6)
+            spawnText(e.pos, `+${event.nutrients ?? 0}`, "#50bb60")
             onArenaEventRef.current(event)
           } else if (e.type === "enemy") {
             const event = rollArenaFight(statsRef.current, biomeRef.current)
-            spawnParticles(e.pos, event.type === "killed_enemy" ? "#aa3030" : "#884488", 10)
-            spawnText(e.pos, event.type === "killed_enemy" ? `+${event.nutrients ?? 0}` : "FLED", event.type === "killed_enemy" ? "#c89030" : "#aa3030")
+            spawnParticles(e.pos, event.type === "killed_enemy" ? "#cc6060" : "#9868a8", 10)
+            spawnText(e.pos, event.type === "killed_enemy" ? `+${event.nutrients ?? 0}` : "FLED", event.type === "killed_enemy" ? "#d4a050" : "#cc6060")
             onArenaEventRef.current(event)
           } else {
             const { event } = rollArenaLoot(biomeRef.current)
-            spawnParticles(e.pos, "#c89030", 8)
+            spawnParticles(e.pos, "#d4a050", 8)
             const label = event.fragments ? "+FRAG" : event.statBoost ? `+1 ${event.statBoost.stat.slice(0, 3).toUpperCase()}` : event.biomass ? `+${event.biomass} BM` : event.nutrients ? `+${event.nutrients}` : "BUFF"
-            spawnText(e.pos, label, "#c89030")
+            spawnText(e.pos, label, "#d4a050")
             onArenaEventRef.current(event)
           }
         }
@@ -277,13 +277,13 @@ export function ArenaView({ biome, stats, colorHex, isActive, onArenaEvent }: Ar
       }
 
       // ── DRAW ─────────────────────────────────────────────
-      // Background
+      // Background -- softer deep-ocean blue
       const biomeColor = biomeRef.current.color
-      ctx.fillStyle = "#030808"
+      ctx.fillStyle = "#0a1820"
       ctx.fillRect(0, 0, ARENA_W, ARENA_H)
 
-      // Biome tint
-      ctx.fillStyle = biomeColor + "0a"
+      // Biome tint (slightly stronger for warmth)
+      ctx.fillStyle = biomeColor + "12"
       ctx.fillRect(0, 0, ARENA_W, ARENA_H)
 
       // Debris
@@ -321,11 +321,11 @@ export function ArenaView({ biome, stats, colorHex, isActive, onArenaEvent }: Ar
           for (const side of [-1, 1]) {
             ctx.beginPath()
             ctx.arc(e.pos.x + side * eyeOff, e.pos.y - eyeOff * 0.5, 2.5, 0, Math.PI * 2)
-            ctx.fillStyle = "#ffdddd"
+            ctx.fillStyle = "#ffe8e8"
             ctx.fill()
             ctx.beginPath()
             ctx.arc(e.pos.x + side * eyeOff, e.pos.y - eyeOff * 0.5, 1, 0, Math.PI * 2)
-            ctx.fillStyle = "#440000"
+            ctx.fillStyle = "#662020"
             ctx.fill()
           }
         }
@@ -378,14 +378,14 @@ export function ArenaView({ biome, stats, colorHex, isActive, onArenaEvent }: Ar
         const ey = py + Math.sin(eyeAngle + side * 0.5) * 5 - 2
         ctx.beginPath()
         ctx.arc(ex, ey, 3, 0, Math.PI * 2)
-        ctx.fillStyle = "#d0e0d0"
+        ctx.fillStyle = "#e0f0e0"
         ctx.fill()
         // Pupil looking in movement direction
         const pupX = ex + Math.cos(eyeAngle) * 1.2
         const pupY = ey + Math.sin(eyeAngle) * 1.2
         ctx.beginPath()
         ctx.arc(pupX, pupY, 1.5, 0, Math.PI * 2)
-        ctx.fillStyle = "#0a1a10"
+        ctx.fillStyle = "#102820"
         ctx.fill()
       }
 
@@ -408,15 +408,9 @@ export function ArenaView({ biome, stats, colorHex, isActive, onArenaEvent }: Ar
         ctx.fillText(ft.text, ft.pos.x, ft.pos.y)
       }
 
-      // Scanline overlay
-      ctx.fillStyle = "rgba(0,0,0,0.04)"
-      for (let y = 0; y < ARENA_H; y += 3) {
-        ctx.fillRect(0, y, ARENA_W, 1)
-      }
-
-      // Border
-      ctx.strokeStyle = "#1e3028"
-      ctx.lineWidth = 2
+      // Soft border
+      ctx.strokeStyle = "#284038"
+      ctx.lineWidth = 1
       ctx.strokeRect(0, 0, ARENA_W, ARENA_H)
 
       raf = requestAnimationFrame(loop)
@@ -434,10 +428,9 @@ export function ArenaView({ biome, stats, colorHex, isActive, onArenaEvent }: Ar
         height={ARENA_H}
         className="w-full max-w-[480px]"
         style={{
-          imageRendering: "pixelated",
-          border: "2px solid #1e3028",
-          borderRadius: "2px",
-          boxShadow: "0 0 12px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.3)",
+          border: "1px solid #284038",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
         }}
       />
     </div>
